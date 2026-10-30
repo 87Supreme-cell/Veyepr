@@ -22,6 +22,7 @@ torch = [
 
 [project.scripts]
 ai-observability-demo = "ai_observability.app:main"
+veyepr-mock-deploy = "ai_observability.mock_deploy:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

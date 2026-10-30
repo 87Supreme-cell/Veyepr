@@ -1,7 +1,7 @@
 # Veyepr Continuation Plan: Passes 3–5
 
-**Status:** Planning handoff only. No Pass 3, 4, or 5 implementation is
-included in this document.  
+**Status:** Pass 3 is in progress. Passes 4 and 5 remain planning handoff
+only.
 **Last completed milestone:** Pass 2 — Harden and Verify (`bdbd7eb`).
 
 This file preserves the product-lead observations and the structure for the
@@ -93,6 +93,19 @@ would flow, what must be configured, and which claims are verified locally.
    - Use buttons for: inspect configuration, run preflight, view generated
      evidence, and review limitations.
    - Clearly distinguish a mock deployment from a real deployment.
+
+## Selected Pass 3 decisions
+
+| Question | Selected decision |
+|---|---|
+| Response to an anomaly | Record and route for human review only. No automatic pause, block, discipline, or alert dispatch. |
+| First signal source | Sanitized agent and AI tool-call metadata, including OAuth scope use and data-export intent. |
+| Default forensic retention | Metadata and content hashes only. Original content retrieval is an external, authorized workflow and is not implemented here. |
+| Review fairness | The review package must preserve a subject-access posture: a finding is context for review, not a finding of fault. |
+
+The selected decisions narrow the Pass 3 prototype to a local policy evaluator
+and evidence generator. It does not intercept traffic, OAuth tokens, agent
+sessions, SharePoint activity, screens, or real data.
 
 ## Explicitly out of scope
 

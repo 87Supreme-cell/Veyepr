@@ -1,0 +1,15 @@
+{
+  "deployment_id": "local-agent-sentinel-demo",
+  "deployment_version": "0.1.0",
+  "environment": "mock_local",
+  "response_mode": "review_only",
+  "retention_mode": "metadata_and_hashes_only",
+  "agent_action_contract": "contracts/agent-action.schema.json",
+  "policy_file": "policy/mock-sentinel-policy.json",
+  "sample_action": "fixtures/suspicious-agent-action.json",
+  "known_limitations": [
+    "This deployment evaluates supplied fixture records only; it does not intercept network traffic, OAuth tokens, or real agent sessions.",
+    "A review-required finding is not a determination of malicious intent or policy violation.",
+    "The package is locally tamper-evident through a hash; immutable storage, signatures, retention, access control, and case management are production responsibilities."
+  ]
+}

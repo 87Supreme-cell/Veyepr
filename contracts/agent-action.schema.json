@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veyepr.dev/contracts/agent-action.schema.json",
+  "title": "Veyepr sanitized agent action",
+  "description": "A metadata-only agent/tool action record for local policy evaluation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_type",
+    "session_id",
+    "action_id",
+    "actor_ref",
+    "timestamp",
+    "tool_name",
+    "action_type",
+    "target_ref",
+    "data_classification",
+    "destination_class",
+    "requested_scopes",
+    "estimated_bytes",
+    "prompt_hash",
+    "tool_output_hash"
+  ],
+  "properties": {
+    "event_type": { "const": "agent_tool_action" },
+    "session_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "action_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "actor_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "A pseudonymous employee or workload reference; not a legal identity."
+    },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "tool_name": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "action_type": {
+      "enum": ["oauth_scope_request", "data_export", "asset_mutation", "tool_read"]
+    },
+    "target_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "An opaque, non-secret resource reference."
+    },
+    "data_classification": { "enum": ["public", "internal", "sensitive"] },
+    "destination_class": { "enum": ["internal", "approved_external", "unknown_external"] },
+    "requested_scopes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 128 },
+      "maxItems": 32,
+      "uniqueItems": true
+    },
+    "estimated_bytes": { "type": "integer", "minimum": 0 },
+    "prompt_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Hash only; raw prompts are excluded from this contract."
+    },
+    "tool_output_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Hash only; raw tool output is excluded from this contract."
+    }
+  }
+}

@@ -45,11 +45,14 @@ class PipelineRequestHandler(BaseHTTPRequestHandler):
             "/": ("index.html", "text/html; charset=utf-8"),
             "/decision-record": ("decision-record.html", "text/html; charset=utf-8"),
             "/decision-record.html": ("decision-record.html", "text/html; charset=utf-8"),
+            "/mock-deploy": ("mock-deploy.html", "text/html; charset=utf-8"),
+            "/mock-deploy.html": ("mock-deploy.html", "text/html; charset=utf-8"),
             "/developer-mode": ("developer-mode.html", "text/html; charset=utf-8"),
             "/developer-mode.html": ("developer-mode.html", "text/html; charset=utf-8"),
             "/assets/styles.css": ("styles.css", "text/css; charset=utf-8"),
             "/assets/app.js": ("app.js", "application/javascript; charset=utf-8"),
             "/assets/developer-mode.js": ("developer-mode.js", "application/javascript; charset=utf-8"),
+            "/assets/mock-deploy.js": ("mock-deploy.js", "application/javascript; charset=utf-8"),
             "/assets/mark.svg": ("mark.svg", "image/svg+xml"),
         }
         asset = static_files.get(path)

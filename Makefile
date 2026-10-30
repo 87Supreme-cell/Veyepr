@@ -1,4 +1,4 @@
-.PHONY: test verify-local verify-compose verify-rust verify-contract verify-rust-container
+.PHONY: test verify-local verify-compose verify-rust verify-contract verify-rust-container mock-deploy
 
 test:
 	python3 -m pytest
@@ -17,3 +17,6 @@ verify-contract:
 
 verify-rust-container:
 	docker run --rm -v "$(CURDIR)/verifier:/workspace" -w /workspace rust:1.79 cargo test --locked
+
+mock-deploy:
+	./scripts/mock-deploy-preflight.sh

@@ -1,0 +1,16 @@
+{
+  "policy_id": "local-agent-review",
+  "policy_version": "0.1.0",
+  "response_mode": "review_only",
+  "retention_mode": "metadata_and_hashes_only",
+  "approved_oauth_scopes": [
+    "files.read",
+    "profile.read"
+  ],
+  "approved_destination_classes": [
+    "internal",
+    "approved_external"
+  ],
+  "sensitive_export_review_threshold_bytes": 4096,
+  "review_sensitive_asset_mutation": true
+}

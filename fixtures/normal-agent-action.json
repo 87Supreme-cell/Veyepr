@@ -1,0 +1,18 @@
+{
+  "event_type": "agent_tool_action",
+  "session_id": "session-demo-001",
+  "action_id": "action-demo-001",
+  "actor_ref": "employee-ref-7",
+  "timestamp": "2026-10-30T06:00:00+00:00",
+  "tool_name": "document-search",
+  "action_type": "tool_read",
+  "target_ref": "knowledge-base:product-brief",
+  "data_classification": "internal",
+  "destination_class": "internal",
+  "requested_scopes": [
+    "files.read"
+  ],
+  "estimated_bytes": 2048,
+  "prompt_hash": "sha256:4c96f186f53d85c171542c1271c5f6b49a7b9cc9d09619af5e71fc9f9e1d8dfe",
+  "tool_output_hash": "sha256:ff1d7b2832b2ed99c88eea3544ee7ec8ad436ba59d0a6de657b257ea00a0e91e"
+}

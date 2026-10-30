@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A review-only local mock-deployment model for Veyepr.">
+    <title>Veyepr | Mock Deployment</title>
+    <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+  </head>
+  <body class="triolingo-page">
+    <a class="skip-link" href="#mock-deployment">Skip to mock deployment</a>
+    <header class="site-header">
+      <a class="wordmark" href="./" aria-label="Veyepr home">VEYEPR<span>.</span></a>
+      <nav aria-label="Primary navigation">
+        <a href="./">Evidence</a>
+        <a href="decision-record.html">Decision record</a>
+        <a aria-current="page" href="mock-deploy.html">Mock deployment</a>
+        <a href="developer-mode.html">Developer mode</a>
+      </nav>
+    </header>
+    <main id="mock-deployment">
+      <section class="tri-hero">
+        <p class="eyebrow"><span class="status-dot"></span> PASS 3 / MOCK DEPLOYMENT</p>
+        <p class="section-index">REVIEW-ONLY SENTINEL</p>
+        <h1>Detect, preserve, and <em>route for review.</em></h1>
+        <p class="lede">This local model evaluates sanitized agent-tool metadata against a declared policy. A matched rule creates a tamper-evident review package for both a security reviewer and the session subject. It does not block a request, read tokens, capture screens, or decide that a person violated policy.</p>
+      </section>
+      <section class="deployment-controls" aria-labelledby="controls-title">
+        <p class="section-index">SELECT AN EVIDENCE VIEW</p>
+        <h2 id="controls-title">One response level: human review.</h2>
+        <div class="control-row" role="group" aria-label="Mock deployment evidence">
+          <button class="button button-primary" type="button" data-panel-target="policy">Inspect policy</button>
+          <button class="button button-quiet" type="button" data-panel-target="package">Inspect review package</button>
+          <button class="button button-quiet" type="button" data-panel-target="limits">Inspect limitations</button>
+        </div>
+        <section class="evidence-view" id="policy" data-evidence-panel>
+          <p class="section-index">POLICY INPUT</p>
+          <h3>Declared local rules</h3>
+          <dl class="evidence-list">
+            <div><dt>Response</dt><dd>Record and route to human review only</dd></div>
+            <div><dt>Primary signal</dt><dd>Sanitized agent/tool action metadata</dd></div>
+            <div><dt>OAuth rule</dt><dd>Review scopes outside the declared allowlist</dd></div>
+            <div><dt>Export rule</dt><dd>Review sensitive exports to unknown destinations or above the local threshold</dd></div>
+            <div><dt>Retention</dt><dd>Metadata and SHA-256 content hashes only</dd></div>
+          </dl>
+        </section>
+        <section class="evidence-view" id="package" data-evidence-panel hidden>
+          <p class="section-index">REVIEW PACKAGE</p>
+          <h3>What a reviewer can verify</h3>
+          <dl class="evidence-list">
+            <div><dt>Case context</dt><dd>Session ID, action ID, pseudonymous actor reference, tool, action type, and timestamp</dd></div>
+            <div><dt>Policy context</dt><dd>Policy ID, policy version, matched rules, and review-only disposition</dd></div>
+            <div><dt>Content handling</dt><dd>Prompt and tool-output hashes; no raw prompt or output in the package</dd></div>
+            <div><dt>Integrity</dt><dd>A SHA-256 digest that reveals later changes if the original digest is retained independently</dd></div>
+            <div><dt>Review parties</dt><dd>Security reviewer and session subject</dd></div>
+          </dl>
+        </section>
+        <section class="evidence-view" id="limits" data-evidence-panel hidden>
+          <p class="section-index">LIMITATIONS</p>
+          <h3>What this mock deployment does not do</h3>
+          <ul class="plain-list">
+            <li>It does not intercept network traffic, OAuth tokens, or real agent sessions.</li>
+            <li>It does not automatically pause, block, discipline, or report a person.</li>
+            <li>It does not retain raw prompts or raw tool outputs.</li>
+            <li>It does not provide immutable storage, signatures, role-based access, or case management.</li>
+            <li>It does not determine malicious intent; a review-required result is a request for human context.</li>
+          </ul>
+        </section>
+      </section>
+      <section class="interview-close">
+        <div>
+          <p class="section-index">LOCAL PROOF</p>
+          <h2>Generate the evidence yourself.</h2>
+          <p>The local preflight uses only repository files and Python’s standard library. It evaluates a fixture, writes new evidence artifacts without overwriting existing ones, and exits clearly on a bad configuration.</p>
+          <pre><code>./scripts/mock-deploy-preflight.sh artifacts/review-demo
+
+# inspect the generated files
+cat artifacts/review-demo/preflight-report.json
+cat artifacts/review-demo/review-package.json</code></pre>
+          <a class="button button-primary" href="developer-mode.html">Open local verification paths <span aria-hidden="true">→</span></a>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>VEYEPR / MOCK DEPLOYMENT</span>
+      <a href="https://github.com/87Supreme-cell/Veyepr">Source repository <span aria-hidden="true">↗</span></a>
+      <span>Evidence before assertion.</span>
+    </footer>
+    <script src="assets/mock-deploy.js"></script>
+  </body>
+</html>

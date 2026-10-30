@@ -42,7 +42,7 @@ in the README so a reviewer can see the decisions without reverse-engineering
 the code.
 
 | Observation | Product decision | Evidence in this repository | Deliberate boundary |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | The public site felt like a gimmick or sales page. | Reframe the interface as an evidence console and decision record. Remove the mascot-led hero and all interview-coaching language. | [`index.html`](src/ai_observability/static/index.html), [`decision-record.html`](src/ai_observability/static/decision-record.html) | The public preview is still a simulated view; it labels itself as such. |
 | Data could not be independently validated. | Publish a strict event schema, fixtures, and dual-runtime validation. | [`training-event.schema.json`](contracts/training-event.schema.json), [`validation.py`](src/ai_observability/validation.py), [`verifier/`](verifier/) | Validation proves event shape and basic semantic constraints, not model-output quality. |
 | Python dependencies could drift or fail. | Pin the reference runtime dependency and provide a separately compiled Rust verifier with a committed lockfile. | [`pyproject.toml`](pyproject.toml), [`verifier/Cargo.toml`](verifier/Cargo.toml), [`verifier/Cargo.lock`](verifier/Cargo.lock) | Python remains the transparent reference service; Rust is the independent contract checker, not an unreviewed full rewrite. |
@@ -70,7 +70,7 @@ The shared contract is
 It requires exactly these fields:
 
 | Field | Constraint | Why it exists |
-|---|---|---|
+| --- | --- | --- |
 | `event_type` | Must be `training_step` | Makes route intent explicit. |
 | `run_id` | Non-empty, maximum 128 characters | Associates events without accepting unbounded identifiers. |
 | `step` | Non-negative integer | Represents training progress. |
@@ -142,7 +142,7 @@ ai-observability-demo --run-id local-reference --interval-seconds 1
 The runtime uses a pinned `prometheus-client` version. It exposes:
 
 | Endpoint | Evidence provided |
-|---|---|
+| --- | --- |
 | `GET /healthz` | Process liveness |
 | `GET /events` | Last normalized, accepted events |
 | `GET /metrics` | Prometheus metrics and accepted/rejected validation counters |
@@ -157,7 +157,7 @@ inputs. They do not use prompts, model completions, deep-research systems, or
 coding agents.
 
 | Test area | Runner | Input | What it proves |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Tensor-like conversion | `tests/test_models.py` | A test object exposing `.item()` | Python can normalize scalar values without importing PyTorch. |
 | Semantic field checks | `tests/test_models.py` | Invalid batch sizes | Invalid numerical constraints are rejected. |
 | Capture, route, and exposition | `tests/test_router.py` | A constructed valid telemetry event and an unknown event | Accepted records route to Prometheus; unmatched records are counted as dropped. |
@@ -189,6 +189,93 @@ control mechanism. The public project has no harmful or privileged tools.
 Production developer access must be enforced by an authenticated server,
 role-based policy, audit logging, and approvals—not a client-side quiz.
 
+## Pass 3 — mock deployment and review-only sentinel
+
+Pass 3 models a narrow, local response to policy-relevant AI-agent behavior:
+it records a sanitized tool action, evaluates the action against a declared
+policy, and creates a review package when a rule matches. It does **not** make
+an automatic enforcement decision.
+
+### Selected product decisions
+
+| Decision | Selected approach | Reason |
+|---|---|---|
+| Initial signal source | Agent and AI tool-call metadata, including declared OAuth scope use and export intent | The first problem is behavioral visibility around tool use, not a shallow prompt filter. |
+| Response | Record and route for human review only | A matched rule can be ambiguous. No person should be automatically blocked or punished from this prototype's output. |
+| Package retention | Metadata and content hashes only | A reviewer can verify that the same prompt/output was referenced without placing raw sensitive content in the local package. |
+| Review fairness | The package names both `security_reviewer` and `session_subject` as review parties | Evidence should support a subject's explanation, not create an unchallengeable accusation. |
+
+### What the sentinel evaluates
+
+The local contract in
+[`contracts/agent-action.schema.json`](contracts/agent-action.schema.json)
+accepts only a sanitized action record:
+
+- Pseudonymous actor and session references.
+- Tool name, action type, opaque resource reference, classification, target
+  destination class, and estimated data volume.
+- Declared requested scopes.
+- SHA-256 hashes of prompt and tool output.
+
+It rejects raw prompts, raw outputs, unknown fields, and malformed metadata.
+The included policy is intentionally small and transparent:
+
+1. Requesting an OAuth scope outside the local allowlist requires review.
+2. Exporting sensitive data to an unknown destination or above the local
+   threshold requires review.
+3. Mutating a sensitive asset requires review when that policy switch is on.
+
+The result is only `no_review_required` or `review_required`, and its response
+mode is always `review_only`. A review-required result is not proof of
+malicious intent, misconduct, or a policy violation.
+
+### What the review package contains
+
+`./scripts/mock-deploy-preflight.sh` writes two new JSON files:
+
+| Artifact | Contents |
+|---|---|
+| `preflight-report.json` | Deployment inputs, SHA-256 file checks, runtime details, passed checks, declared limitations, and the review outcome. |
+| `review-package.json` | Sanitized action metadata, prompt/output hashes, policy ID and version, findings, review parties, and a tamper-evident SHA-256 payload digest. |
+
+The package is **not immutable by itself**. Its digest only reveals later
+changes if the original digest is stored independently. A real system would
+need signed packages, immutable retention, identity-based access control,
+case-management workflow, and a documented subject-access process.
+
+### Run the mock deployment locally
+
+No Docker, network service, token, or cloud account is required:
+
+```bash
+./scripts/mock-deploy-preflight.sh artifacts/review-demo
+```
+
+The script refuses to overwrite an existing evidence directory. The supplied
+fixture describes a sensitive export to an unknown external destination with
+an unapproved OAuth scope. Its expected result is `review_required` with two
+findings; it does not block or report anything.
+
+To run the same command with the default output path:
+
+```bash
+make mock-deploy
+```
+
+## Sentinel non-goals and security boundary
+
+This repository is **not** a transparent network proxy, endpoint sensor, OAuth
+collector, SharePoint monitor, screen-capture agent, or active enforcement
+product. It does not retrieve JWTs, intercept traffic, extract data, suspend
+sessions, send alerts to a security team, or evaluate real employee behavior.
+
+Those capabilities would require explicit legal, privacy, security, identity,
+retention, and employee-notice decisions. If they are considered later, the
+out-of-band enforcement component must be independently authorized and unable
+to be controlled by the LLM it observes. Its records must be reviewable by
+both security and the affected subject; no client-side UI gate can provide
+that guarantee.
+
 ## Optional Compose integration proof
 
 Docker is not required for normal local use. If Docker Desktop is available,
@@ -205,7 +292,7 @@ reports the telemetry target as healthy. It shuts the stack down afterward.
 ## Metric contract
 
 | Metric | Type | Labels | Meaning |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `ai_training_loss` | Gauge | `run_id` | Latest reported loss from an accepted event. |
 | `ai_training_gradient_norm` | Gauge | `run_id` | Latest reported gradient norm from an accepted event. |
 | `ai_training_batch_size` | Gauge | `run_id` | Latest reported batch size from an accepted event. |
@@ -220,9 +307,9 @@ appropriate event store subject to the organisation's data policy.
 ## Roadmap
 
 | Pass | Name | Focus |
-|---|---|---|
+| --- | --- | --- |
 | 1 | Opening Salvo | Public evidence console and accessible project narrative. |
 | 2 | Harden and Verify | Contract validation, independent verifier, documented tests, local proof, and scope boundaries. |
-| 3 | mock_deploy | A reviewed deployment model without cloud credentials. |
+| 3 | mock_deploy | A review-only local deployment model for sanitized agent-action policy evidence. |
 | 4 | Break_b4_Buying | Deliberately test failure modes and recovery assumptions before infrastructure spend. |
 | 5 | Interlude | Consolidate verified evidence, decisions, and next-step recommendations. |

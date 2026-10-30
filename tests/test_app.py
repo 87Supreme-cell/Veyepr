@@ -24,11 +24,14 @@ def test_console_and_triolingo_pages_are_served() -> None:
             assert response.headers["Content-Type"].startswith("text/html")
         with urlopen(f"http://127.0.0.1:{port}/decision-record") as response:
             decision_record = response.read().decode("utf-8")
+        with urlopen(f"http://127.0.0.1:{port}/mock-deploy") as response:
+            mock_deploy = response.read().decode("utf-8")
         with urlopen(f"http://127.0.0.1:{port}/developer-mode") as response:
             developer_mode = response.read().decode("utf-8")
 
         assert "VEYEPR" in page
         assert "Decision Record" in decision_record
+        assert "Mock Deployment" in mock_deploy
         assert "Developer mode" in developer_mode
     finally:
         server.shutdown()

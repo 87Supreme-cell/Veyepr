@@ -12,9 +12,9 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 mkdir -p "$site/assets"
-cp src/ai_observability/static/index.html src/ai_observability/static/decision-record.html src/ai_observability/static/developer-mode.html "$site/"
+cp src/ai_observability/static/index.html src/ai_observability/static/decision-record.html src/ai_observability/static/mock-deploy.html src/ai_observability/static/developer-mode.html "$site/"
 cp src/ai_observability/static/metrics src/ai_observability/static/events "$site/"
-cp src/ai_observability/static/styles.css src/ai_observability/static/app.js src/ai_observability/static/developer-mode.js src/ai_observability/static/mark.svg "$site/assets/"
+cp src/ai_observability/static/styles.css src/ai_observability/static/app.js src/ai_observability/static/developer-mode.js src/ai_observability/static/mock-deploy.js src/ai_observability/static/mark.svg "$site/assets/"
 
 python3 -m http.server "$port" --directory "$site" >/tmp/veyepr-local-preview.log 2>&1 &
 preview_pid=$!
@@ -31,6 +31,7 @@ done
 
 curl --fail --silent "http://127.0.0.1:${port}/assets/styles.css" | grep -q -- '--ink'
 curl --fail --silent "http://127.0.0.1:${port}/decision-record.html" | grep -q 'Decision Record'
+curl --fail --silent "http://127.0.0.1:${port}/mock-deploy.html" | grep -q 'Mock Deployment'
 curl --fail --silent "http://127.0.0.1:${port}/developer-mode.html" | grep -q 'Developer mode'
 curl --fail --silent "http://127.0.0.1:${port}/metrics" | grep -q '^veyepr_portfolio_preview 1'
 
