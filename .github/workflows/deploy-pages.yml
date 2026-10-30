@@ -29,9 +29,9 @@ jobs:
       - name: Assemble static portfolio
         run: |
           mkdir -p _site/assets
-          cp src/ai_observability/static/index.html src/ai_observability/static/decision-record.html src/ai_observability/static/mock-deploy.html src/ai_observability/static/developer-mode.html _site/
+          cp src/ai_observability/static/index.html src/ai_observability/static/decision-record.html src/ai_observability/static/mock-deploy.html src/ai_observability/static/developer-mode.html src/ai_observability/static/break-b4-buying.html src/ai_observability/static/interlude.html _site/
           cp src/ai_observability/static/metrics src/ai_observability/static/events _site/
-          cp src/ai_observability/static/styles.css src/ai_observability/static/app.js src/ai_observability/static/developer-mode.js src/ai_observability/static/mock-deploy.js src/ai_observability/static/mark.svg _site/assets/
+          cp src/ai_observability/static/styles.css src/ai_observability/static/app.js src/ai_observability/static/developer-mode.js src/ai_observability/static/mock-deploy.js src/ai_observability/static/break-drills.js src/ai_observability/static/mark.svg _site/assets/
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload portfolio artifact

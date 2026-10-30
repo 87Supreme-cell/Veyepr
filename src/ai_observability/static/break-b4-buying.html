@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Fixture-only failure and recovery drills for Veyepr.">
+    <title>Veyepr | Break Before Buying</title>
+    <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+  </head>
+  <body class="triolingo-page">
+    <a class="skip-link" href="#drills">Skip to failure drills</a>
+    <header class="site-header">
+      <a class="wordmark" href="./" aria-label="Veyepr home">VEYEPR<span>.</span></a>
+      <nav aria-label="Primary navigation">
+        <a href="./">Evidence</a>
+        <a href="decision-record.html">Decision record</a>
+        <a href="mock-deploy.html">Mock deployment</a>
+        <a aria-current="page" href="break-b4-buying.html">Break before buying</a>
+        <a href="interlude.html">Interlude</a>
+      </nav>
+    </header>
+    <main id="drills">
+      <section class="tri-hero">
+        <p class="eyebrow"><span class="status-dot"></span> PASS 4 / BREAK_B4_BUYING</p>
+        <p class="section-index">FIXTURE-ONLY FAILURE DRILLS</p>
+        <h1>Test the evidence path <em>before infrastructure spend.</em></h1>
+        <p class="lede">These five local scenarios exercise rejection, review routing, and clean recovery with sanitized metadata. They do not inject faults into a live service, contact an OAuth provider, or use employee, customer, prompt, or tool-output content.</p>
+      </section>
+      <section class="deployment-controls" aria-labelledby="drill-title">
+        <p class="section-index">SELECT A FIXTURE SCENARIO</p>
+        <h2 id="drill-title">Expected results are declared before execution.</h2>
+        <div class="control-row" role="group" aria-label="Failure drill scenarios">
+          <button class="button button-primary" type="button" aria-pressed="true" data-panel-target="reject">Contract rejection</button>
+          <button class="button button-quiet" type="button" aria-pressed="false" data-panel-target="sequence">Sequence ambiguity</button>
+          <button class="button button-quiet" type="button" aria-pressed="false" data-panel-target="policy">Policy review</button>
+          <button class="button button-quiet" type="button" aria-pressed="false" data-panel-target="recovery">Clean recovery</button>
+        </div>
+        <section class="evidence-view" id="reject" data-evidence-panel>
+          <p class="section-index">REJECTED</p>
+          <h3>Unknown metadata is not accepted or echoed.</h3>
+          <dl class="evidence-list">
+            <div><dt>Fixture</dt><dd>A sanitized action with one unreviewed field</dd></div>
+            <div><dt>Expected result</dt><dd><code>rejected</code> before policy evaluation</dd></div>
+            <div><dt>Evidence retained</dt><dd>Record count and a generic contract-rejection reason; no raw field value</dd></div>
+            <div><dt>Recovery</dt><dd>Correct the record against the published contract and submit a new action</dd></div>
+          </dl>
+        </section>
+        <section class="evidence-view" id="sequence" data-evidence-panel hidden>
+          <p class="section-index">REVIEW REQUIRED</p>
+          <h3>Duplicate IDs and timestamp regressions stay visible.</h3>
+          <dl class="evidence-list">
+            <div><dt>Fixtures</dt><dd>Duplicate action ID and out-of-order timestamp sequences</dd></div>
+            <div><dt>Expected result</dt><dd><code>review_required</code>; neither sequence becomes a success-shaped response</dd></div>
+            <div><dt>Evidence retained</dt><dd>Action identifiers, session references, content hashes, and the rule that matched</dd></div>
+            <div><dt>Recovery</dt><dd>Preserve the drill report, fix the sequence in a new record set, then evaluate it independently</dd></div>
+          </dl>
+        </section>
+        <section class="evidence-view" id="policy" data-evidence-panel hidden>
+          <p class="section-index">REVIEW REQUIRED</p>
+          <h3>A sensitive export is a review signal, not a verdict.</h3>
+          <dl class="evidence-list">
+            <div><dt>Fixture</dt><dd>Sensitive export metadata with an unapproved scope and unknown destination class</dd></div>
+            <div><dt>Expected result</dt><dd><code>review_required</code> with declared policy findings</dd></div>
+            <div><dt>Not performed</dt><dd>No block, external alert, token capture, network request, or disciplinary action</dd></div>
+            <div><dt>Contract guard</dt><dd>The drill refuses to run if the published action schema stops rejecting unknown fields</dd></div>
+          </dl>
+        </section>
+        <section class="evidence-view" id="recovery" data-evidence-panel hidden>
+          <p class="section-index">NO REVIEW REQUIRED</p>
+          <h3>A later clean action is evaluated on its own evidence.</h3>
+          <dl class="evidence-list">
+            <div><dt>Fixture</dt><dd>A valid internal read in a distinct session</dd></div>
+            <div><dt>Expected result</dt><dd><code>no_review_required</code></dd></div>
+            <div><dt>Preservation rule</dt><dd>Prior rejected and review-required drill evidence is not erased</dd></div>
+            <div><dt>Fairness rule</dt><dd>Review-required asks for context; it never concludes misconduct or malicious intent</dd></div>
+          </dl>
+        </section>
+      </section>
+      <section class="interview-close">
+        <div>
+          <p class="section-index">LOCAL PROOF</p>
+          <h2>Run the drills without Docker.</h2>
+          <p>The command validates the published schema, runs local JSON fixtures, refuses to overwrite an existing report directory, and writes one tamper-evident report.</p>
+          <pre><code>./scripts/run-break-drills.sh artifacts/break-b4-buying
+cat artifacts/break-b4-buying/drill-report.json</code></pre>
+          <a class="button button-primary" href="interlude.html">Read the evidence dossier <span aria-hidden="true">→</span></a>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>VEYEPR / BREAK_B4_BUYING</span>
+      <a href="https://github.com/87Supreme-cell/Veyepr">Source repository <span aria-hidden="true">↗</span></a>
+      <span>Evidence before assertion.</span>
+    </footer>
+    <script src="assets/break-drills.js"></script>
+  </body>
+</html>

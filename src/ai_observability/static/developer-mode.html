@@ -19,6 +19,8 @@
         <a href="./">Evidence</a>
         <a href="decision-record.html">Decision record</a>
         <a href="mock-deploy.html">Mock deployment</a>
+        <a href="break-b4-buying.html">Failure drills</a>
+        <a href="interlude.html">Interlude</a>
         <a aria-current="page" href="developer-mode.html">Developer mode</a>
       </nav>
     </header>
@@ -65,7 +67,10 @@ make verify-rust
 make verify-contract
 
 # Optional full Compose integration proof
-make verify-compose</code></pre>
+make verify-compose
+
+# Fixture-only failure and recovery drills
+./scripts/run-break-drills.sh artifacts/break-b4-buying</code></pre>
           <a class="button button-quiet" href="https://github.com/87Supreme-cell/Veyepr/tree/main/fixtures">Inspect contract fixtures <span aria-hidden="true">↗</span></a>
         </section>
       </section>

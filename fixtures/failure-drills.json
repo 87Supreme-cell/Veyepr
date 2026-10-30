@@ -1,0 +1,168 @@
+{
+  "drill_suite_version": "0.1.0",
+  "scenarios": [
+    {
+      "scenario_id": "unknown-field-rejected",
+      "description": "A record with an unreviewed field must be rejected before policy evaluation.",
+      "expected_disposition": "rejected",
+      "actions": [
+        {
+          "event_type": "agent_tool_action",
+          "session_id": "session-drill-001",
+          "action_id": "action-drill-001",
+          "actor_ref": "employee-ref-7",
+          "timestamp": "2026-10-30T06:00:00+00:00",
+          "tool_name": "document-search",
+          "action_type": "tool_read",
+          "target_ref": "knowledge-base:product-brief",
+          "data_classification": "internal",
+          "destination_class": "internal",
+          "requested_scopes": [
+            "files.read"
+          ],
+          "estimated_bytes": 2048,
+          "prompt_hash": "sha256:4c96f186f53d85c171542c1271c5f6b49a7b9cc9d09619af5e71fc9f9e1d8dfe",
+          "tool_output_hash": "sha256:ff1d7b2832b2ed99c88eea3544ee7ec8ad436ba59d0a6de657b257ea00a0e91e",
+          "unreviewed_metadata": "fixture-only"
+        }
+      ]
+    },
+    {
+      "scenario_id": "duplicate-action-review",
+      "description": "Duplicate action identifiers require review because the record sequence is ambiguous.",
+      "expected_disposition": "review_required",
+      "actions": [
+        {
+          "event_type": "agent_tool_action",
+          "session_id": "session-drill-002",
+          "action_id": "action-drill-002",
+          "actor_ref": "employee-ref-7",
+          "timestamp": "2026-10-30T06:01:00+00:00",
+          "tool_name": "document-search",
+          "action_type": "tool_read",
+          "target_ref": "knowledge-base:product-brief",
+          "data_classification": "internal",
+          "destination_class": "internal",
+          "requested_scopes": [
+            "files.read"
+          ],
+          "estimated_bytes": 2048,
+          "prompt_hash": "sha256:4c96f186f53d85c171542c1271c5f6b49a7b9cc9d09619af5e71fc9f9e1d8dfe",
+          "tool_output_hash": "sha256:ff1d7b2832b2ed99c88eea3544ee7ec8ad436ba59d0a6de657b257ea00a0e91e"
+        },
+        {
+          "event_type": "agent_tool_action",
+          "session_id": "session-drill-002",
+          "action_id": "action-drill-002",
+          "actor_ref": "employee-ref-7",
+          "timestamp": "2026-10-30T06:02:00+00:00",
+          "tool_name": "document-search",
+          "action_type": "tool_read",
+          "target_ref": "knowledge-base:product-brief",
+          "data_classification": "internal",
+          "destination_class": "internal",
+          "requested_scopes": [
+            "files.read"
+          ],
+          "estimated_bytes": 2048,
+          "prompt_hash": "sha256:4c96f186f53d85c171542c1271c5f6b49a7b9cc9d09619af5e71fc9f9e1d8dfe",
+          "tool_output_hash": "sha256:ff1d7b2832b2ed99c88eea3544ee7ec8ad436ba59d0a6de657b257ea00a0e91e"
+        }
+      ]
+    },
+    {
+      "scenario_id": "out-of-order-review",
+      "description": "A timestamp regression requires review because action order cannot be trusted.",
+      "expected_disposition": "review_required",
+      "actions": [
+        {
+          "event_type": "agent_tool_action",
+          "session_id": "session-drill-003",
+          "action_id": "action-drill-003a",
+          "actor_ref": "employee-ref-7",
+          "timestamp": "2026-10-30T06:04:00+00:00",
+          "tool_name": "document-search",
+          "action_type": "tool_read",
+          "target_ref": "knowledge-base:product-brief",
+          "data_classification": "internal",
+          "destination_class": "internal",
+          "requested_scopes": [
+            "files.read"
+          ],
+          "estimated_bytes": 2048,
+          "prompt_hash": "sha256:4c96f186f53d85c171542c1271c5f6b49a7b9cc9d09619af5e71fc9f9e1d8dfe",
+          "tool_output_hash": "sha256:ff1d7b2832b2ed99c88eea3544ee7ec8ad436ba59d0a6de657b257ea00a0e91e"
+        },
+        {
+          "event_type": "agent_tool_action",
+          "session_id": "session-drill-003",
+          "action_id": "action-drill-003b",
+          "actor_ref": "employee-ref-7",
+          "timestamp": "2026-10-30T06:03:00+00:00",
+          "tool_name": "document-search",
+          "action_type": "tool_read",
+          "target_ref": "knowledge-base:product-brief",
+          "data_classification": "internal",
+          "destination_class": "internal",
+          "requested_scopes": [
+            "files.read"
+          ],
+          "estimated_bytes": 2048,
+          "prompt_hash": "sha256:4c96f186f53d85c171542c1271c5f6b49a7b9cc9d09619af5e71fc9f9e1d8dfe",
+          "tool_output_hash": "sha256:ff1d7b2832b2ed99c88eea3544ee7ec8ad436ba59d0a6de657b257ea00a0e91e"
+        }
+      ]
+    },
+    {
+      "scenario_id": "sensitive-export-review",
+      "description": "A sensitive export to an unknown destination requires human review.",
+      "expected_disposition": "review_required",
+      "actions": [
+        {
+          "event_type": "agent_tool_action",
+          "session_id": "session-drill-004",
+          "action_id": "action-drill-004",
+          "actor_ref": "employee-ref-7",
+          "timestamp": "2026-10-30T06:05:00+00:00",
+          "tool_name": "workspace-export",
+          "action_type": "data_export",
+          "target_ref": "dataset-ref:customer-success",
+          "data_classification": "sensitive",
+          "destination_class": "unknown_external",
+          "requested_scopes": [
+            "files.read",
+            "directory.read.all"
+          ],
+          "estimated_bytes": 8192,
+          "prompt_hash": "sha256:755237f5e7d0cd574ca84bcb1c377214b44083068e14bc862451f1d0f473c960",
+          "tool_output_hash": "sha256:da359fdf5386aeea8951f42a8e1e9c29d1bbd51e3a9c5e691e8b3f195e486dd4"
+        }
+      ]
+    },
+    {
+      "scenario_id": "clean-recovery",
+      "description": "A subsequent valid internal read remains eligible for no-review-required after prior drill scenarios.",
+      "expected_disposition": "no_review_required",
+      "actions": [
+        {
+          "event_type": "agent_tool_action",
+          "session_id": "session-drill-005",
+          "action_id": "action-drill-005",
+          "actor_ref": "employee-ref-7",
+          "timestamp": "2026-10-30T06:06:00+00:00",
+          "tool_name": "document-search",
+          "action_type": "tool_read",
+          "target_ref": "knowledge-base:product-brief",
+          "data_classification": "internal",
+          "destination_class": "internal",
+          "requested_scopes": [
+            "files.read"
+          ],
+          "estimated_bytes": 2048,
+          "prompt_hash": "sha256:4c96f186f53d85c171542c1271c5f6b49a7b9cc9d09619af5e71fc9f9e1d8dfe",
+          "tool_output_hash": "sha256:ff1d7b2832b2ed99c88eea3544ee7ec8ad436ba59d0a6de657b257ea00a0e91e"
+        }
+      ]
+    }
+  ]
+}

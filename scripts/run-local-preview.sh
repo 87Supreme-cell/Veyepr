@@ -11,9 +11,9 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 mkdir -p "$site/assets"
-cp src/ai_observability/static/index.html src/ai_observability/static/decision-record.html src/ai_observability/static/mock-deploy.html src/ai_observability/static/developer-mode.html "$site/"
+cp src/ai_observability/static/index.html src/ai_observability/static/decision-record.html src/ai_observability/static/mock-deploy.html src/ai_observability/static/developer-mode.html src/ai_observability/static/break-b4-buying.html src/ai_observability/static/interlude.html "$site/"
 cp src/ai_observability/static/metrics src/ai_observability/static/events "$site/"
-cp src/ai_observability/static/styles.css src/ai_observability/static/app.js src/ai_observability/static/developer-mode.js src/ai_observability/static/mock-deploy.js src/ai_observability/static/mark.svg "$site/assets/"
+cp src/ai_observability/static/styles.css src/ai_observability/static/app.js src/ai_observability/static/developer-mode.js src/ai_observability/static/mock-deploy.js src/ai_observability/static/break-drills.js src/ai_observability/static/mark.svg "$site/assets/"
 
 echo "Serving the dependency-free portfolio preview at http://127.0.0.1:${port}/"
 echo "Press Ctrl-C to stop."

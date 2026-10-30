@@ -1,4 +1,4 @@
-.PHONY: test verify-local verify-compose verify-rust verify-contract verify-rust-container mock-deploy
+.PHONY: test verify-local verify-compose verify-rust verify-contract verify-rust-container mock-deploy break-drills
 
 test:
 	python3 -m pytest
@@ -20,3 +20,6 @@ verify-rust-container:
 
 mock-deploy:
 	./scripts/mock-deploy-preflight.sh
+
+break-drills:
+	./scripts/run-break-drills.sh

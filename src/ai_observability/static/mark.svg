@@ -1,5 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Veyepr assurance mark">
-  <rect width="64" height="64" rx="12" fill="#0b1816"/>
-  <path d="M12 32c5-9 12-14 20-14s15 5 20 14c-5 9-12 14-20 14S17 41 12 32Z" fill="none" stroke="#b9e36b" stroke-width="4"/>
-  <circle cx="32" cy="32" r="7" fill="#eabf4d"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title description">
+  <title id="title">Veyepr cyber viper mark</title>
+  <desc id="description">A coiled purple viper with circuit-trace details and one bright eye.</desc>
+  <defs>
+    <linearGradient id="viper" x1="20" y1="18" x2="105" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DAB5FF"/>
+      <stop offset=".42" stop-color="#9147FF"/>
+      <stop offset="1" stop-color="#43147C"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#11091F"/>
+  <path d="M25 92c-6-29 12-52 40-52 29 0 44 17 42 39-2 23-22 35-49 31-20-3-31-9-33-18Z" fill="none" stroke="url(#viper)" stroke-linecap="round" stroke-width="11"/>
+  <path d="M55 81c11-18 25-32 44-40l13 7-5 17-17 8-7 13-16 5Z" fill="url(#viper)" stroke="#E8D5FF" stroke-linejoin="round" stroke-width="2"/>
+  <path d="M94 53 106 55 100 61" fill="none" stroke="#11091F" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+  <path d="M95 62c3-4 9-4 11 0-3 5-8 5-11 0Z" fill="#F5EDFF"/>
+  <circle cx="101" cy="62" r="2" fill="#8A2BFF"/>
+  <path d="M24 89h18l8 8h13m-33-23 11 10h11m12-30 9 9h11m-5 30 9-9h12" fill="none" stroke="#C391FF" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+  <circle cx="24" cy="89" r="3" fill="#E8D5FF"/>
+  <circle cx="30" cy="74" r="3" fill="#E8D5FF"/>
+  <circle cx="64" cy="54" r="3" fill="#E8D5FF"/>
+  <circle cx="107" cy="84" r="3" fill="#E8D5FF"/>
 </svg>

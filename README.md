@@ -1,5 +1,9 @@
 # Veyepr: Evidence-First AI Usage Assurance
 
+<p align="center">
+  <img src="src/ai_observability/static/mark.svg" width="144" alt="Veyepr purple cyber viper mark">
+</p>
+
 Veyepr is a local reference implementation for **collecting, validating, and
 observing AI-training telemetry**. It is being developed from a product-lead
 perspective: before an enterprise is handed a score about AI usage or model
@@ -9,6 +13,18 @@ decision policy behind that score.
 **Public preview:** [Veyepr evidence console](https://87supreme-cell.github.io/Veyepr/)<br>
 **Decision record:** [Pass 2 product and architecture decisions](https://87supreme-cell.github.io/Veyepr/decision-record.html)
 **Developer mode:** [Local verification paths](https://87supreme-cell.github.io/Veyepr/developer-mode.html)
+**Failure drills:** [Pass 4 fixture-only scenarios](https://87supreme-cell.github.io/Veyepr/break-b4-buying.html)<br>
+**Evidence dossier:** [Pass 5 facts and next decision](https://87supreme-cell.github.io/Veyepr/interlude.html)
+
+## Portfolio preview
+
+The screenshots below are captured from the dependency-free local preview.
+They show the interface and fixture-backed evidence flow only; they do not
+represent a hosted telemetry backend or live enterprise activity.
+
+| Evidence console | Failure-drill explorer |
+| --- | --- |
+| ![Veyepr evidence console screenshot](docs/screenshots/evidence-console.png) | ![Veyepr failure-drill explorer screenshot](docs/screenshots/failure-drills.png) |
 
 ## What this project does today
 
@@ -21,6 +37,10 @@ decision policy behind that score.
    pipeline and an independent Rust verifier.
 5. Provides a dependency-free browser preview and explicit local verification
    commands.
+6. Evaluates sanitized agent-action fixtures against a review-only policy and
+   creates metadata-and-hash evidence packages.
+7. Exercises five fixture-only failure and recovery scenarios before proposing
+   further infrastructure investment.
 
 ## What this project does **not** claim to do
 
@@ -104,7 +124,7 @@ developer-mode flow. It does not claim to be a running telemetry backend.
 make verify-local
 ```
 
-This starts a temporary local static server, checks all three public pages,
+This starts a temporary local static server, checks all six public pages,
 checks the preview metrics fixture, and parses the JSON Schema plus valid
 fixture. It needs only `python3`, `curl`, and standard shell tools.
 
@@ -150,11 +170,27 @@ The runtime uses a pinned `prometheus-client` version. It exposes:
 | `GET /decision-record` | Product and architecture choices |
 | `GET /developer-mode` | Local developer instructions after the knowledge check |
 
-## Test catalogue and inputs
+## Test and verification evidence
 
 The tests are intentionally small, deterministic, and explicit about their
 inputs. They do not use prompts, model completions, deep-research systems, or
 coding agents.
+
+### Latest recorded local verification
+
+| Check | Command | Latest recorded outcome | Evidence |
+| --- | --- | --- | --- |
+| Python suite | `.venv/bin/python -m pytest -vv` | 25 individual tests passed | [`PASS_6_TEST_LOG.md`](PASS_6_TEST_LOG.md) |
+| Static preview | `./scripts/verify-local.sh` | Passed: six public pages, assets, preview metrics, and JSON fixtures | [`PASS_6_TEST_LOG.md`](PASS_6_TEST_LOG.md) |
+| Review-only preflight | `./scripts/mock-deploy-preflight.sh <new-directory>` | Passed: `review_required` with two findings | [`PASS_6_TEST_LOG.md`](PASS_6_TEST_LOG.md) |
+| Failure drills | `./scripts/run-break-drills.sh <new-directory>` | Passed: one rejected, three review-required, one clean recovery | [`PASS_6_TEST_LOG.md`](PASS_6_TEST_LOG.md) |
+| Rust verifier | `(cd verifier && cargo test --locked)` | Not run in the Pass 6 environment because `cargo` was unavailable | [`PASS_6_TEST_LOG.md`](PASS_6_TEST_LOG.md) |
+
+The last row is intentionally not presented as a pass. Run it on a host with
+Rust 1.79 or newer before treating the independent verifier as current
+evidence.
+
+### Test catalogue and inputs
 
 | Test area | Runner | Input | What it proves |
 | --- | --- | --- | --- |
@@ -168,12 +204,19 @@ coding agents.
 | Rust contract verification | `verifier/src/main.rs` | Constructed valid event, empty ID, unknown JSON field | The independent verifier enforces the same key boundary. |
 | Local preview proof | `scripts/verify-local.sh` | Static files and fixtures | The no-Docker preview and contract inputs are available locally. |
 | Optional stack proof | `scripts/verify-compose.sh` | Docker Compose services | The app, metrics, events, and Prometheus scrape target become healthy together. |
+| Review-only preflight | `tests/test_mock_deploy.py` | Mock deployment config, policy, and sensitive-export fixture | The local preflight creates metadata-only review evidence and refuses overwrites. |
+| Failure and recovery drills | `tests/test_drills.py` | [`failure-drills.json`](fixtures/failure-drills.json) | Five expected outcomes are deterministic: one rejected, three review-required, and one clean recovery. |
+| Contract drift guard | `tests/test_drills.py` | A weakened copy of the agent-action schema | The drills refuse a schema that permits unknown metadata fields. |
 
 Run the Python suite:
 
 ```bash
-python3 -m pytest
+.venv/bin/python -m pytest -vv
 ```
+
+The verbose command produces each test name and result. The committed Pass 6
+log is a reviewable snapshot of that output, not a substitute for rerunning
+the suite after a change.
 
 ## Developer mode is not authorization
 
@@ -262,6 +305,53 @@ To run the same command with the default output path:
 make mock-deploy
 ```
 
+## Pass 4 — Break_b4_Buying: fixture-only failure drills
+
+Pass 4 tests whether the local evidence model handles known bad inputs
+explicitly rather than silently accepting them. It is not a penetration test
+and does not send malformed traffic to a live system. Every scenario is local,
+deterministic, and declared in
+[`fixtures/failure-drills.json`](fixtures/failure-drills.json).
+
+| Scenario | Expected disposition | Evidence retained | Recovery posture |
+| --- | --- | --- | --- |
+| Unknown action field | `rejected` | Record count and a generic contract-rejection reason | Submit a corrected record as a new action. |
+| Duplicate action ID | `review_required` | Sanitized identifiers, content hashes, and matched rule | Preserve the report; evaluate a corrected sequence independently. |
+| Timestamp regression | `review_required` | Sanitized identifiers, content hashes, and matched rule | Preserve the report; evaluate a corrected sequence independently. |
+| Sensitive export policy mismatch | `review_required` | Sanitized metadata, hashes, and policy findings | Request human context; do not block or discipline. |
+| Clean later action | `no_review_required` | Sanitized identifiers and hashes | Prior evidence remains preserved; the new action is evaluated independently. |
+
+Run the drill suite without Docker or external accounts:
+
+```bash
+./scripts/run-break-drills.sh artifacts/break-b4-buying
+cat artifacts/break-b4-buying/drill-report.json
+```
+
+The command refuses to overwrite an existing output directory. Before
+evaluating fixtures, it also verifies that the published
+[`agent-action.schema.json`](contracts/agent-action.schema.json) still rejects
+unknown fields and retains the runtime’s metadata-only contract invariants.
+The output contains no raw prompts, raw tool outputs, network activity, or
+tool execution.
+
+## Pass 5 — Interlude: evidence dossier
+
+[`EVIDENCE_DOSSIER.md`](EVIDENCE_DOSSIER.md) is the source of record for this
+reference implementation’s verified commands, contracts, deliberate
+limitations, and next investment decision. It does not claim production
+readiness. Its purpose is to let a product lead, technical partner, or
+enterprise evaluator decide whether a bounded technical-validation spike is
+worth authorizing.
+
+## Pass 6 — Test log
+
+[`PASS_6_TEST_LOG.md`](PASS_6_TEST_LOG.md) preserves the verbose transcript of
+every collected Python test in the Pass 6 run, alongside the exact output from
+the static-preview, mock-deployment, and failure-drill checks. It also names
+the Rust verifier check as unavailable in the current environment rather than
+misrepresenting it as a pass.
+
 ## Sentinel non-goals and security boundary
 
 This repository is **not** a transparent network proxy, endpoint sensor, OAuth
@@ -313,3 +403,4 @@ appropriate event store subject to the organisation's data policy.
 | 3 | mock_deploy | A review-only local deployment model for sanitized agent-action policy evidence. |
 | 4 | Break_b4_Buying | Deliberately test failure modes and recovery assumptions before infrastructure spend. |
 | 5 | Interlude | Consolidate verified evidence, decisions, and next-step recommendations. |
+| 6 | Test log | Preserve the verbose local test transcript and operational-check output. |

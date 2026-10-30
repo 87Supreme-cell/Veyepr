@@ -1,8 +1,14 @@
 # Veyepr Continuation Plan: Passes 3–5
 
-**Status:** Pass 3 — mock deployment is implemented locally in `f3c1b9c`.
-Passes 4 and 5 remain planning handoff only.
-**Last completed milestone:** Pass 2 — Harden and Verify (`bdbd7eb`).
+**Status:** Passes 3–5 are implemented locally. Pass 4 adds fixture-only
+failure/recovery drills; Pass 5 consolidates the verified state in
+[`EVIDENCE_DOSSIER.md`](EVIDENCE_DOSSIER.md).
+**Last completed milestone:** Pass 6 — Test log.
+
+**Pass 6 record:** [`PASS_6_TEST_LOG.md`](PASS_6_TEST_LOG.md) contains the
+verbose transcript for all collected Python tests and the output of the
+no-Docker operational checks. It records the unavailable Rust toolchain
+explicitly rather than counting it as a pass.
 
 This file preserves the product-lead observations and the structure for the
 next three working sessions. It is intentionally specific enough to resume
@@ -111,9 +117,10 @@ sessions, SharePoint activity, screens, or real data.
 
 The local implementation has completed these proof points:
 
-- `20` deterministic Python tests pass, including normal action, review-required
-  action, metadata-only package, tamper detection, output-collision rejection,
-  and mock-deployment preflight cases.
+- The current full Python suite result is recorded in
+  [`EVIDENCE_DOSSIER.md`](EVIDENCE_DOSSIER.md), including normal action,
+  review-required action, metadata-only package, tamper detection,
+  output-collision rejection, and mock-deployment preflight cases.
 - `./scripts/verify-local.sh` passes without Docker or external packages.
 - `./scripts/mock-deploy-preflight.sh <new-directory>` creates a preflight
   report plus a review package for the supplied sensitive-export fixture.
@@ -167,6 +174,26 @@ Resolve these one at a time:
 ---
 
 # Pass 4 — `Break_b4_Buying`
+
+## Implementation status
+
+Pass 4 is implemented as a local, fixture-only drill suite:
+
+- [`fixtures/failure-drills.json`](fixtures/failure-drills.json) declares five
+  scenarios and their expected disposition before execution.
+- [`scripts/run-break-drills.sh`](scripts/run-break-drills.sh) validates the
+  agent-action schema invariants, evaluates the scenarios, refuses overwrites,
+  and writes one tamper-evident `drill-report.json`.
+- [`tests/test_drills.py`](tests/test_drills.py) covers declared outcomes,
+  metadata-only rejection evidence, independent clean recovery, and a
+  weakened-schema rejection.
+- [`break-b4-buying.html`](src/ai_observability/static/break-b4-buying.html)
+  is a passive fixture explorer. It cannot run drills, inject faults, or
+  affect a live system.
+
+The implemented scenarios are: unknown-field rejection, duplicate action ID,
+timestamp regression, sensitive export policy mismatch, and clean subsequent
+action. The result remains review-only; it never concludes misconduct.
 
 ## Objective
 
@@ -237,6 +264,16 @@ Resolve these one at a time:
 ---
 
 # Pass 5 — `Interlude`
+
+## Implementation status
+
+Pass 5 is implemented as
+[`EVIDENCE_DOSSIER.md`](EVIDENCE_DOSSIER.md) plus a static
+[`interlude.html`](src/ai_observability/static/interlude.html) summary. The
+dossier identifies reproducible commands, contracts, verified local
+capabilities, simulated elements, privacy/security gaps, and the next
+investment gate. It adds no surveillance, enforcement, or new collection
+capability.
 
 ## Objective
 
