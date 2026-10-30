@@ -58,7 +58,7 @@ function showSignal({ loss, gradient, batch, step, total, runId, event }) {
   renderNumber(elements.batch, batch, 0);
   renderNumber(elements.step, step, 0);
   elements.runId.textContent = runId ? `run / ${runId}` : "waiting for run";
-  elements.count.textContent = `${Math.round(total || 0)} events routed`;
+  elements.count.textContent = `${Math.round(total || 0)} events accepted`;
 
   if (event) {
     elements.summary.textContent = event;

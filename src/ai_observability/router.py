@@ -11,6 +11,7 @@ from typing import Any, Literal
 from prometheus_client import CollectorRegistry, Counter, Gauge, generate_latest
 
 from .models import TrainingTelemetry
+from .validation import training_event_from_record
 
 RouteName = Literal["prometheus", "dropped"]
 
@@ -86,6 +87,12 @@ class PrometheusTrainingMetrics:
             ("route",),
             registry=self.registry,
         )
+        self.validation_events = Counter(
+            "ai_telemetry_validation_events",
+            "Telemetry records accepted or rejected by the contract validator.",
+            ("outcome",),
+            registry=self.registry,
+        )
 
     def observe(self, event: CapturedEvent) -> None:
         labels = {"run_id": event.run_id}
@@ -97,6 +104,9 @@ class PrometheusTrainingMetrics:
 
     def record_drop(self) -> None:
         self.events.labels(route="dropped").inc()
+
+    def record_validation(self, outcome: Literal["accepted", "rejected"]) -> None:
+        self.validation_events.labels(outcome=outcome).inc()
 
     def render_latest(self) -> bytes:
         return generate_latest(self.registry)
@@ -120,14 +130,20 @@ class LocalStreamPipeline:
         self.metrics = metrics or PrometheusTrainingMetrics()
 
     def process(self, telemetry: TrainingTelemetry | dict[str, Any]) -> RouteName:
-        event = self._transform(telemetry)
+        try:
+            event = self._transform(telemetry)
+        except (TypeError, ValueError):
+            self.metrics.record_validation("rejected")
+            raise
         self.capture.append(event)
 
         if event.event_type == "training_step":
             self.metrics.observe(event)
+            self.metrics.record_validation("accepted")
             return "prometheus"
 
         self.metrics.record_drop()
+        self.metrics.record_validation("rejected")
         return "dropped"
 
     @staticmethod
@@ -135,7 +151,10 @@ class LocalStreamPipeline:
         if isinstance(telemetry, TrainingTelemetry):
             record = telemetry.to_record()
         elif isinstance(telemetry, dict):
-            record = telemetry
+            if telemetry.get("event_type") == "training_step":
+                record = training_event_from_record(telemetry).to_record()
+            else:
+                record = telemetry
         else:
             raise TypeError("telemetry must be TrainingTelemetry or a dictionary")
 
@@ -181,4 +200,3 @@ def _parse_timestamp(value: object) -> datetime | None:
     if parsed.tzinfo is None:
         raise ValueError("timestamp must include a timezone")
     return parsed
-

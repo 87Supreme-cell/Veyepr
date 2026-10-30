@@ -1,0 +1,9 @@
+{
+  "event_type": "training_step",
+  "run_id": "verification-run",
+  "step": 42,
+  "loss": 0.183,
+  "gradient_norm": 0.91,
+  "batch_size": 32,
+  "timestamp": "2026-10-30T06:00:00+00:00"
+}

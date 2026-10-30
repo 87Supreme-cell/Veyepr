@@ -43,11 +43,14 @@ class PipelineRequestHandler(BaseHTTPRequestHandler):
             return
         static_files = {
             "/": ("index.html", "text/html; charset=utf-8"),
-            "/triolingo": ("triolingo.html", "text/html; charset=utf-8"),
-            "/triolingo.html": ("triolingo.html", "text/html; charset=utf-8"),
+            "/decision-record": ("decision-record.html", "text/html; charset=utf-8"),
+            "/decision-record.html": ("decision-record.html", "text/html; charset=utf-8"),
+            "/developer-mode": ("developer-mode.html", "text/html; charset=utf-8"),
+            "/developer-mode.html": ("developer-mode.html", "text/html; charset=utf-8"),
             "/assets/styles.css": ("styles.css", "text/css; charset=utf-8"),
             "/assets/app.js": ("app.js", "application/javascript; charset=utf-8"),
-            "/assets/vioer.svg": ("vioer.svg", "image/svg+xml"),
+            "/assets/developer-mode.js": ("developer-mode.js", "application/javascript; charset=utf-8"),
+            "/assets/mark.svg": ("mark.svg", "image/svg+xml"),
         }
         asset = static_files.get(path)
         if asset:

@@ -3,142 +3,111 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A live, local observability console for AI training telemetry.">
-    <title>Veyepr | Observe the training signal</title>
-    <link rel="icon" href="assets/vioer.svg" type="image/svg+xml">
+    <meta name="description" content="Evidence-first AI usage assurance and telemetry validation.">
+    <title>Veyepr | AI Usage Assurance</title>
+    <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/styles.css">
   </head>
   <body>
-    <a class="skip-link" href="#signal">Skip to live signal</a>
+    <a class="skip-link" href="#evidence">Skip to evidence</a>
     <header class="site-header">
       <a class="wordmark" href="./" aria-label="Veyepr home">VEYEPR<span>.</span></a>
       <nav aria-label="Primary navigation">
-        <a href="#signal">Live signal</a>
-        <a href="#system">The system</a>
-        <a href="triolingo.html">Triolingo</a>
+        <a href="#evidence">Evidence</a>
+        <a href="#assurance">Assurance model</a>
+        <a href="decision-record.html">Decision record</a>
       </nav>
-      <a class="header-link" href="https://github.com/87Supreme-cell/Veyepr">Repository <span aria-hidden="true">↗</span></a>
+      <a class="header-link" href="developer-mode.html">Developer mode <span aria-hidden="true">→</span></a>
     </header>
 
     <main>
       <section class="hero" aria-labelledby="hero-title">
-        <div class="eyebrow"><span class="status-dot"></span> Local pipeline online</div>
+        <div class="eyebrow"><span class="status-dot"></span> Reference implementation</div>
         <div class="hero-copy">
-          <p class="section-index">01 / OBSERVE</p>
-          <h1 id="hero-title">A quiet place to <em>watch</em> a model learn.</h1>
-          <p class="lede">Veyepr turns each training step into a legible signal: loss, gradient health, batch size, and the proof that your telemetry reached its destination.</p>
+          <p class="section-index">01 / EVIDENCE</p>
+          <h1 id="hero-title">AI usage evidence that can be <em>checked.</em></h1>
+          <p class="lede">Veyepr is a reference pipeline for collecting, validating, and exposing stable AI-training signals. It is designed to make operational claims traceable before an enterprise adopts a broader governance platform.</p>
           <div class="hero-actions">
-            <a class="button button-primary" href="#signal">Watch the signal <span aria-hidden="true">↓</span></a>
-            <a class="button button-quiet" href="triolingo.html">Explain it simply <span aria-hidden="true">→</span></a>
+            <a class="button button-primary" href="#evidence">Inspect the evidence <span aria-hidden="true">↓</span></a>
+            <a class="button button-quiet" href="developer-mode.html">Open developer mode <span aria-hidden="true">→</span></a>
           </div>
         </div>
-        <figure class="vioer-stage">
-          <div class="orb orb-one"></div>
-          <div class="orb orb-two"></div>
-          <img src="assets/vioer.svg" alt="Vioer, the observant sleeping viper mascot" width="320" height="220">
-          <figcaption>Vioer rests. One eye stays on the signal.</figcaption>
-        </figure>
-        <div class="hero-ruler" aria-hidden="true"><span>LOSS</span><i></i><span>GRADIENT</span><i></i><span>ROUTE</span></div>
+        <aside class="evidence-panel" aria-label="Assurance controls">
+          <p>ASSURANCE CONTROLS</p>
+          <dl>
+            <div><dt>Wire contract</dt><dd>Strict JSON schema</dd></div>
+            <div><dt>Reference runtime</dt><dd>Python, tested</dd></div>
+            <div><dt>Independent check</dt><dd>Rust, locked</dd></div>
+            <div><dt>Deployment proof</dt><dd>Compose verification</dd></div>
+          </dl>
+        </aside>
+        <div class="hero-ruler" aria-hidden="true"><span>CONTRACT</span><i></i><span>VALIDATE</span><i></i><span>OBSERVE</span></div>
       </section>
 
-      <section class="signal" id="signal" aria-labelledby="signal-title">
+      <section class="signal" id="evidence" aria-labelledby="evidence-title">
         <div class="section-heading">
           <div>
-            <p class="section-index">02 / LIVE READOUT</p>
-            <h2 id="signal-title">What the trainer is saying <em>right now.</em></h2>
+            <p class="section-index">02 / CURRENT EVIDENCE</p>
+            <h2 id="evidence-title">Observed training telemetry.</h2>
           </div>
           <p class="refresh-message"><span class="status-dot"></span> Refreshes every 2 seconds</p>
         </div>
         <div class="readout">
           <div class="metric-list" aria-live="polite">
-            <div class="metric-row">
-              <span class="metric-label">Loss <small>lower is better</small></span>
-              <output id="loss-value">—</output>
-            </div>
-            <div class="metric-row">
-              <span class="metric-label">Gradient norm <small>update strength</small></span>
-              <output id="gradient-value">—</output>
-            </div>
-            <div class="metric-row">
-              <span class="metric-label">Batch size <small>examples / step</small></span>
-              <output id="batch-value">—</output>
-            </div>
-            <div class="metric-row">
-              <span class="metric-label">Current step <small id="run-id">waiting for run</small></span>
-              <output id="step-value">—</output>
-            </div>
+            <div class="metric-row"><span class="metric-label">Loss <small>reported training error</small></span><output id="loss-value">—</output></div>
+            <div class="metric-row"><span class="metric-label">Gradient norm <small>reported update magnitude</small></span><output id="gradient-value">—</output></div>
+            <div class="metric-row"><span class="metric-label">Batch size <small>reported examples per step</small></span><output id="batch-value">—</output></div>
+            <div class="metric-row"><span class="metric-label">Current step <small id="run-id">waiting for verified run</small></span><output id="step-value">—</output></div>
           </div>
           <div class="signal-plot">
-            <div class="plot-meta"><span>LOSS / RECENT WINDOW</span><span id="event-count">0 events routed</span></div>
-            <svg id="loss-chart" viewBox="0 0 640 260" role="img" aria-label="Recent training loss trend">
-              <defs>
-                <linearGradient id="area-fill" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stop-color="#b9e36b" stop-opacity=".36"/>
-                  <stop offset="100%" stop-color="#b9e36b" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
+            <div class="plot-meta"><span>LOSS / RECENT WINDOW</span><span id="event-count">0 events accepted</span></div>
+            <svg id="loss-chart" viewBox="0 0 640 260" role="img" aria-label="Recent training loss evidence">
+              <defs><linearGradient id="area-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#b9e36b" stop-opacity=".36"/><stop offset="100%" stop-color="#b9e36b" stop-opacity="0"/></linearGradient></defs>
               <path class="chart-grid" d="M0 50H640M0 130H640M0 210H640"/>
               <path id="loss-area" fill="url(#area-fill)" d=""/>
               <polyline id="loss-line" fill="none" stroke="#b9e36b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points=""/>
               <circle id="loss-point" r="6" fill="#eabf4d" stroke="#0b1816" stroke-width="4" cx="0" cy="0"/>
             </svg>
-            <p id="event-summary" class="event-summary">Waiting for the first training event.</p>
+            <p id="event-summary" class="event-summary">Awaiting a validated event.</p>
           </div>
         </div>
       </section>
 
-      <section class="system" id="system" aria-labelledby="system-title">
+      <section class="system" id="assurance" aria-labelledby="assurance-title">
         <div class="section-heading">
           <div>
-            <p class="section-index">03 / THE SYSTEM</p>
-            <h2 id="system-title">One event. Four deliberate <em>moves.</em></h2>
+            <p class="section-index">03 / ASSURANCE MODEL</p>
+            <h2 id="assurance-title">Separate collection from judgment.</h2>
           </div>
-          <p class="system-note">No proprietary agent. No cloud account. The same chain is visible from source to dashboard.</p>
+          <p class="system-note">The current release validates operational telemetry. It does not claim to evaluate model-output quality without a defined business rubric and review policy.</p>
         </div>
         <ol class="pipeline">
-          <li>
-            <span class="pipeline-number">01</span>
-            <div><h3>Emit</h3><p>A simulated loop, or optional PyTorch loop, creates a record for each training step.</p></div>
-            <code>loss · grad · batch</code>
-          </li>
-          <li>
-            <span class="pipeline-number">02</span>
-            <div><h3>Capture</h3><p>A bounded buffer preserves a small, inspectable sample before anything is transformed.</p></div>
-            <code>/events</code>
-          </li>
-          <li>
-            <span class="pipeline-number">03</span>
-            <div><h3>Shape</h3><p>The local router validates values, normalizes timestamps, and adds pipeline context.</p></div>
-            <code>training_step</code>
-          </li>
-          <li>
-            <span class="pipeline-number">04</span>
-            <div><h3>Route</h3><p>Prometheus receives bounded, dashboard-ready metrics. Everything else is counted as a drop.</p></div>
-            <code>/metrics</code>
-          </li>
+          <li><span class="pipeline-number">01</span><div><h3>Collect</h3><p>Capture a stable, bounded set of training fields with their original run context.</p></div><code>event</code></li>
+          <li><span class="pipeline-number">02</span><div><h3>Validate</h3><p>Reject malformed or ambiguous records against a published contract before they affect downstream evidence.</p></div><code>schema</code></li>
+          <li><span class="pipeline-number">03</span><div><h3>Observe</h3><p>Expose accepted records as bounded metrics and preserve a small inspection window for corroboration.</p></div><code>metrics</code></li>
+          <li><span class="pipeline-number">04</span><div><h3>Assess</h3><p>Keep quality grading as a future, policy-defined layer with explicit criteria, traceability, and human review.</p></div><code>policy</code></li>
         </ol>
       </section>
 
       <section class="case-study" aria-labelledby="case-study-title">
-        <p class="section-index">04 / PORTFOLIO NOTE</p>
+        <p class="section-index">04 / SCOPE BOUNDARY</p>
         <div class="case-layout">
-          <h2 id="case-study-title">Built as a working explanation, not a mock dashboard.</h2>
+          <h2 id="case-study-title">Useful evidence is not the same as an unearned score.</h2>
           <div>
-            <p>Veyepr is a small, production-minded demonstration of an observability boundary: Python owns the event contract; Prometheus owns time-series collection; Grafana owns the operational view.</p>
-            <p>The important decision is what does <em>not</em> become a label. Steps, prompts, and timestamps stay in the event stream so the metric store remains fast and affordable.</p>
-            <a class="text-link" href="triolingo.html">Read the interview-ready breakdown <span aria-hidden="true">→</span></a>
+            <p>Veyepr currently proves that telemetry has a valid shape and a visible route. It does not present a synthetic “AI quality” grade. Any enterprise output assessment must be tied to a declared rubric, a dataset or policy context, an accountable owner, and retained evidence.</p>
+            <p>This boundary is deliberate: the system should make data quality and operational behavior inspectable before it tries to make consequential judgments about model use or output.</p>
+            <a class="text-link" href="decision-record.html">Review the product decisions <span aria-hidden="true">→</span></a>
           </div>
         </div>
       </section>
     </main>
-
     <footer>
-      <span>VEYEPR / LOCAL AI OBSERVABILITY</span>
+      <span>VEYEPR / AI USAGE ASSURANCE</span>
       <a href="https://github.com/87Supreme-cell/Veyepr">Source repository <span aria-hidden="true">↗</span></a>
-      <span>Built to make signal visible.</span>
+      <span>Evidence before assertion.</span>
     </footer>
     <script src="assets/app.js"></script>
   </body>

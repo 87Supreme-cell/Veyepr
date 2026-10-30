@@ -30,14 +30,24 @@ def test_training_event_converts_scalar_tensor_like_values() -> None:
     assert event.to_record()["event_type"] == "training_step"
 
 
-@pytest.mark.parametrize("batch_size", [0, 4.5, True])
-def test_training_event_rejects_invalid_batch_size(batch_size: object) -> None:
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("batch_size", 0),
+        ("batch_size", 4.5),
+        ("batch_size", True),
+        ("step", 1.5),
+        ("gradient_norm", -0.1),
+    ],
+)
+def test_training_event_rejects_invalid_contract_values(field: str, value: object) -> None:
+    arguments: dict[str, object] = {
+        "run_id": "run",
+        "step": 1,
+        "loss": 1.0,
+        "gradient_norm": 1.0,
+        "batch_size": 32,
+    }
+    arguments[field] = value
     with pytest.raises((TypeError, ValueError)):
-        TrainingTelemetry.from_training_step(
-            run_id="run",
-            step=1,
-            loss=1.0,
-            gradient_norm=1.0,
-            batch_size=batch_size,
-        )
-
+        TrainingTelemetry.from_training_step(**arguments)

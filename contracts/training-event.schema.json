@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veyepr.dev/contracts/training-event.schema.json",
+  "title": "Veyepr training telemetry event",
+  "description": "The strict wire contract accepted by the local reference pipeline and Rust verifier.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_type",
+    "run_id",
+    "step",
+    "loss",
+    "gradient_norm",
+    "batch_size",
+    "timestamp"
+  ],
+  "properties": {
+    "event_type": {
+      "const": "training_step"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "step": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "loss": {
+      "type": "number"
+    },
+    "gradient_norm": {
+      "type": "number",
+      "minimum": 0
+    },
+    "batch_size": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

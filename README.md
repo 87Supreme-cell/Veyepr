@@ -1,273 +1,228 @@
-# Veyepr: Local AI Observability Pipeline
+# Veyepr: Evidence-First AI Usage Assurance
 
-> **Portfolio case study:** an approachable, production-minded telemetry
-> boundary for model training. It is intentionally runnable without cloud
-> credentials, a GPU, PyTorch, or a proprietary routing product.
+Veyepr is a local reference implementation for **collecting, validating, and
+observing AI-training telemetry**. It is being developed from a product-lead
+perspective: before an enterprise is handed a score about AI usage or model
+output, it should be able to inspect the evidence, the contract, and the
+decision policy behind that score.
 
-A complete, local demonstration of AI training observability:
+**Public preview:** [Veyepr evidence console](https://87supreme-cell.github.io/Veyepr/)<br>
+**Decision record:** [Pass 2 product and architecture decisions](https://87supreme-cell.github.io/Veyepr/decision-record.html)
+**Developer mode:** [Local verification paths](https://87supreme-cell.github.io/Veyepr/developer-mode.html)
 
-1. A simulated or optional PyTorch training loop emits `loss`, `gradient_norm`,
-   `batch_size`, `run_id`, and `step`.
-2. A small, explicit Python implementation captures, normalizes, enriches, and
-   routes those events, teaching the same flow-control concepts as Cribl Stream
-   without a proprietary SDK or server.
-3. The Prometheus route publishes current training values and route counts at
-   `/metrics`.
-4. Prometheus scrapes those metrics and Grafana loads a dashboard automatically.
+## What this project does today
 
-The simulation is the default, so neither a GPU nor PyTorch is required.
+1. Produces a structured training event with a run ID, step, loss, gradient
+   norm, batch size, and timestamp.
+2. Rejects malformed training events against a published contract.
+3. Exposes accepted telemetry as bounded Prometheus metrics and preserves a
+   small event-inspection window.
+4. Proves the contract through two implementations: the Python reference
+   pipeline and an independent Rust verifier.
+5. Provides a dependency-free browser preview and explicit local verification
+   commands.
 
-## Public portfolio preview
+## What this project does **not** claim to do
 
-The public, shareable experience is deployed through GitHub Pages:
+Veyepr does **not** currently score whether a model answer is factually
+correct, safe, compliant, or appropriate for a specific business use. Those
+are consequential judgments. A credible implementation needs a declared
+rubric, permitted data sources, a human review owner, retained evidence, and
+an appeals or correction process.
 
-**[Open the Veyepr portfolio preview](https://87Supreme-cell.github.io/Veyepr/)**
+It also does **not** send prompts to an LLM, perform deep research, operate a
+coding agent, or run one-shot prompt evaluations. The tests in this repository
+are deterministic telemetry, contract, HTTP, and deployment checks. They use
+fixture JSON and simulated numeric training signals only.
 
-The Pages build is intentionally self-contained. It shows a browser-simulated
-training signal so visitors can explore the console and Triolingo without
-needing access to a running container, Prometheus, or Grafana. When the same
-assets are served by the Python app, they automatically use the live local
-`/metrics` and `/events` endpoints instead.
+## Pass 2 — Harden and Verify: decision record
 
-The workflow in [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml)
-publishes the static console whenever its frontend assets change on `main`. If
-the preview is not yet available, enable **GitHub Pages → Build and deployment
-→ GitHub Actions** in the repository settings, then rerun the workflow.
+This pass responds to explicit product review observations. The table is kept
+in the README so a reviewer can see the decisions without reverse-engineering
+the code.
 
-## Project path
+| Observation | Product decision | Evidence in this repository | Deliberate boundary |
+|---|---|---|---|
+| The public site felt like a gimmick or sales page. | Reframe the interface as an evidence console and decision record. Remove the mascot-led hero and all interview-coaching language. | [`index.html`](src/ai_observability/static/index.html), [`decision-record.html`](src/ai_observability/static/decision-record.html) | The public preview is still a simulated view; it labels itself as such. |
+| Data could not be independently validated. | Publish a strict event schema, fixtures, and dual-runtime validation. | [`training-event.schema.json`](contracts/training-event.schema.json), [`validation.py`](src/ai_observability/validation.py), [`verifier/`](verifier/) | Validation proves event shape and basic semantic constraints, not model-output quality. |
+| Python dependencies could drift or fail. | Pin the reference runtime dependency and provide a separately compiled Rust verifier with a committed lockfile. | [`pyproject.toml`](pyproject.toml), [`verifier/Cargo.toml`](verifier/Cargo.toml), [`verifier/Cargo.lock`](verifier/Cargo.lock) | Python remains the transparent reference service; Rust is the independent contract checker, not an unreviewed full rewrite. |
+| The tests and their inputs were unclear. | Document every test class, fixture, runner, and non-use of prompts below. | [Test catalogue](#test-catalogue-and-inputs) | No LLM evaluation is implied by these tests. |
+| Advanced controls should require demonstrated understanding. | Add a short, button-led developer-mode knowledge check before exposing local inspection instructions. | [`developer-mode.html`](src/ai_observability/static/developer-mode.html) | This is an intent/learning check, **not** access control. Real privileged actions require server-side authorization. |
+| Docker should not be required. | Make the browser preview and contract-fixture verification run locally without Docker or external Python packages. Keep Compose as an optional integration proof. | [`run-local-preview.sh`](scripts/run-local-preview.sh), [`verify-local.sh`](scripts/verify-local.sh) | The full Prometheus/Grafana integration remains optional because it is a separate infrastructure test. |
 
-This project is being built in deliberate passes so each milestone can be
-explained and verified:
-
-| Pass | Name | Intent |
-|---|---|---|
-| 1 | **Opening Salvo** | Publish an accessible portfolio preview, establish the narrative, and make the interface explorable without localhost. |
-| 2 | **Harden and Verify** | Establish runtime checks, negative-path coverage, accessibility review, and reproducible verification. |
-| 3 | **mock_deploy** | Model a production release path and deployment configuration without requiring cloud credentials. |
-| 4 | **Break_b4_Buying** | Intentionally exercise failure modes, recovery paths, and operating assumptions before committing to infrastructure spend. |
-| 5 | **Interlude** | Consolidate the working result into a concise, interview-ready narrative and evidence package. |
-
-## Portfolio walkthrough
-
-Veyepr is designed around one practical question: **how can an engineer tell
-whether a model-training run is healthy without turning every training detail
-into an expensive metric?**
-
-The project demonstrates:
-
-- **A stable telemetry contract.** `TrainingTelemetry` receives the training
-  values at the application boundary and accepts both ordinary Python numbers
-  and PyTorch-style scalar tensors.
-- **A visible routing boundary.** Capture, normalization, enrichment, and
-  routing are separate operations so the observable behavior is easy to
-  explain, test, and replace with a managed router later.
-- **Intentional metric cardinality.** `run_id` is the only training label;
-  ever-changing values such as steps, timestamps, prompts, and inputs remain
-  in the event stream rather than multiplying Prometheus time series.
-- **An operational interface.** The root route is a live observation console
-  powered by the same `/metrics` and `/events` APIs consumed by Prometheus.
-  `/triolingo` is an interview-ready, plain-English walkthrough of the design.
-
-### Interface routes
-
-| Route | Audience | Purpose |
-|---|---|---|
-| `/` | Developer or operator | A live, auto-refreshing readout of loss, gradient norm, batch size, current step, routed count, and loss trend. |
-| `/triolingo` | Interviewer or new CS student | Explains the project in plain English, system-thinking language, and code-thinking language. |
-| `/events` | Developer | Shows a bounded sample of normalized events. |
-| `/metrics` | Prometheus | Exposes the Prometheus text-format metric contract. |
-| `/healthz` | Runtime platform | Provides a lightweight health response. |
-
-## Architecture
+## Architecture and assurance boundary
 
 ```mermaid
 flowchart LR
-    T[Simulated or PyTorch trainer] --> E[TrainingTelemetry]
-    E --> C[Capture\nbounded in-memory event buffer]
-    C --> X[Transform\nvalidate, normalize, enrich]
-    X --> R{Route\ntraining_step?}
-    R -->|yes| M[Prometheus metric sink]
-    R -->|no| D[Dropped-event counter]
-    M --> H[/metrics HTTP endpoint/]
-    H --> P[Prometheus]
-    P --> G[Grafana dashboard]
+    P[Training producer] --> C[Published event contract]
+    C --> V[Python validation boundary]
+    C --> R[Rust verifier]
+    V --> E[Bounded event evidence]
+    V --> M[Prometheus metrics]
+    E --> I[Operator inspection]
+    M --> O[Operational dashboard]
+    I --> A[Future policy-defined assessment]
+    O --> A
 ```
 
-`LocalStreamPipeline` in `src/ai_observability/router.py` is intentionally
-small and inspectable. It represents the following local equivalents:
+The shared contract is
+[`contracts/training-event.schema.json`](contracts/training-event.schema.json).
+It requires exactly these fields:
 
-| Stream concept | Local demo equivalent | What it does |
+| Field | Constraint | Why it exists |
 |---|---|---|
-| Source/capture | `EventCapture` | Retains a bounded, thread-safe sample of incoming records. |
-| Pipeline transform | `LocalStreamPipeline._transform` | Validates fields, converts scalar tensor-like values with `.item()`, adds `captured_at` and `pipeline`. |
-| Route | `LocalStreamPipeline.process` | Sends `training_step` events to the Prometheus sink and counts other types as dropped. |
-| Destination | `PrometheusTrainingMetrics` | Exposes the latest per-run values and route counters. |
+| `event_type` | Must be `training_step` | Makes route intent explicit. |
+| `run_id` | Non-empty, maximum 128 characters | Associates events without accepting unbounded identifiers. |
+| `step` | Non-negative integer | Represents training progress. |
+| `loss` | Finite number | Captures reported training error. |
+| `gradient_norm` | Finite, non-negative number | Captures reported update magnitude. |
+| `batch_size` | Positive integer | Provides training-volume context. |
+| `timestamp` | RFC 3339 with a timezone | Establishes an unambiguous event time. |
 
-This is not a Cribl SDK wrapper and does not connect to a Cribl instance.
+The schema rejects unknown fields. That is intentional for the reference
+contract: an enterprise integration should version a changed contract instead
+of silently accepting fields with unreviewed meaning.
 
-## Prerequisites
+## Run locally with no Docker
 
-- Python 3.10 or later
-- Docker Desktop with Docker Compose v2 for the full Prometheus/Grafana stack
-- `curl` for the HTTP examples
+### 1. Open the public preview from local files
 
-PyTorch is optional. The `torch` backend downloads PyTorch separately and may
-need a platform-specific install command from [pytorch.org](https://pytorch.org/).
-
-## Quick start: complete local stack
-
-Start the app, Prometheus, and Grafana:
-
-```bash
-docker compose up --build
-```
-
-When running Docker Compose locally, open:
-
-| Local service | Address |
-|---|---|
-| Veyepr live console | `http://localhost:8000` |
-| Triolingo explainer | `http://localhost:8000/triolingo` |
-| App metrics | `http://localhost:8000/metrics` |
-| Captured event sample | `http://localhost:8000/events` |
-| Prometheus | `http://localhost:9090` |
-| Grafana | `http://localhost:3000` (`admin` / `admin`) |
-
-Grafana provisions **Local AI Observability / Local AI Training
-Observability** automatically. Stop and remove containers plus persisted
-metrics with:
+This requires only a standard Python 3 installation; it uses
+`python3 -m http.server` and has **no pip dependencies**:
 
 ```bash
-docker compose down --volumes
+./scripts/run-local-preview.sh
 ```
 
-## Quick start: Python app only
+Open `http://127.0.0.1:8000`. The local preview contains browser-simulated
+telemetry and is suitable for reviewing the interface, decisions, and
+developer-mode flow. It does not claim to be a running telemetry backend.
 
-Create and activate a virtual environment, then install the project:
+### 2. Verify the local preview and contract fixtures
+
+```bash
+make verify-local
+```
+
+This starts a temporary local static server, checks all three public pages,
+checks the preview metrics fixture, and parses the JSON Schema plus valid
+fixture. It needs only `python3`, `curl`, and standard shell tools.
+
+### 3. Verify the contract with Rust, without Docker
+
+Install Rust 1.79 or newer locally, then run:
+
+```bash
+cd verifier
+cargo test --locked
+cargo run --locked -- ../fixtures/valid-training-event.json
+```
+
+`Cargo.lock` pins the exact dependency graph. The verifier emits a JSON result
+and exits nonzero for invalid input:
+
+```bash
+cargo run --locked -- ../fixtures/invalid-training-event.json
+# {"valid":false,"error":"..."}
+```
+
+## Optional Python reference service
+
+The service is optional for the public preview. It is useful when validating
+the live capture/route/Prometheus behavior:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
-ai-observability-demo --run-id notebook-demo --interval-seconds 1
+ai-observability-demo --run-id local-reference --interval-seconds 1
 ```
 
-The default `simulated` backend continuously emits plausible decreasing loss
-and gradient-norm values. It exposes:
+The runtime uses a pinned `prometheus-client` version. It exposes:
 
-| Endpoint | Purpose |
+| Endpoint | Evidence provided |
 |---|---|
-| `GET /healthz` | Liveness response: `{"status":"ok"}` |
-| `GET /metrics` | Prometheus text exposition |
-| `GET /events` | Last captured normalized events, useful for learning and debugging |
-| `GET /` | Veyepr's live observation console |
-| `GET /triolingo` | The plain-English interview explainer |
+| `GET /healthz` | Process liveness |
+| `GET /events` | Last normalized, accepted events |
+| `GET /metrics` | Prometheus metrics and accepted/rejected validation counters |
+| `GET /` | Evidence console backed by the local endpoints |
+| `GET /decision-record` | Product and architecture choices |
+| `GET /developer-mode` | Local developer instructions after the knowledge check |
 
-Use the optional real PyTorch loop only after installing a compatible PyTorch
-distribution:
+## Test catalogue and inputs
+
+The tests are intentionally small, deterministic, and explicit about their
+inputs. They do not use prompts, model completions, deep-research systems, or
+coding agents.
+
+| Test area | Runner | Input | What it proves |
+|---|---|---|---|
+| Tensor-like conversion | `tests/test_models.py` | A test object exposing `.item()` | Python can normalize scalar values without importing PyTorch. |
+| Semantic field checks | `tests/test_models.py` | Invalid batch sizes | Invalid numerical constraints are rejected. |
+| Capture, route, and exposition | `tests/test_router.py` | A constructed valid telemetry event and an unknown event | Accepted records route to Prometheus; unmatched records are counted as dropped. |
+| Contract acceptance | `tests/test_validation.py` | [`valid-training-event.json`](fixtures/valid-training-event.json) | The Python validator accepts the published happy-path example. |
+| Contract rejection | `tests/test_validation.py` | [`invalid-training-event.json`](fixtures/invalid-training-event.json) | Empty IDs, negative steps, zero batch size, and invalid timestamps fail. |
+| Validation telemetry | `tests/test_validation.py` | One valid and one invalid fixture | Accepted and rejected contract counters are exposed. |
+| HTTP delivery | `tests/test_app.py` | Local ephemeral HTTP server | The evidence console, decision record, and developer mode are served. |
+| Rust contract verification | `verifier/src/main.rs` | Constructed valid event, empty ID, unknown JSON field | The independent verifier enforces the same key boundary. |
+| Local preview proof | `scripts/verify-local.sh` | Static files and fixtures | The no-Docker preview and contract inputs are available locally. |
+| Optional stack proof | `scripts/verify-compose.sh` | Docker Compose services | The app, metrics, events, and Prometheus scrape target become healthy together. |
+
+Run the Python suite:
 
 ```bash
-python -m pip install -e ".[torch]"
-ai-observability-demo --backend torch --run-id torch-demo --batch-size 32
+python3 -m pytest
 ```
 
-If PyTorch is unavailable, the default simulation continues to work.
+## Developer mode is not authorization
 
-## Inspecting the telemetry
+The developer-mode page asks three multiple-choice questions:
 
-With the app running:
+1. Why changing step values do not belong in Prometheus labels.
+2. What the current verifier proves.
+3. Where consequential output grading must live.
+
+Passing stores a flag only in the browser's `sessionStorage` and reveals
+documentation links. It is deliberately **not** a safety, identity, or access
+control mechanism. The public project has no harmful or privileged tools.
+Production developer access must be enforced by an authenticated server,
+role-based policy, audit logging, and approvals—not a client-side quiz.
+
+## Optional Compose integration proof
+
+Docker is not required for normal local use. If Docker Desktop is available,
+the following adds Prometheus and Grafana to the reference service:
 
 ```bash
-curl -s http://localhost:8000/healthz
-curl -s http://localhost:8000/events
-curl -s http://localhost:8000/metrics | grep '^ai_'
+make verify-compose
 ```
 
-An event in `/events` includes the source values and local transform metadata:
+This command builds the services, waits for `/healthz`, asserts the training
+and validation metrics, checks captured events, and confirms that Prometheus
+reports the telemetry target as healthy. It shuts the stack down afterward.
 
-```json
-{
-  "event_type": "training_step",
-  "run_id": "notebook-demo",
-  "step": 5,
-  "loss": 1.65,
-  "gradient_norm": 2.19,
-  "batch_size": 32,
-  "timestamp": "2026-01-01T00:00:00+00:00",
-  "captured_at": "2026-01-01T00:00:00+00:00",
-  "pipeline": "local-cribl-equivalent"
-}
-```
-
-The precise simulated values and timestamps vary.
-
-### Prometheus queries
-
-Run these in the Prometheus expression browser or Grafana Explore:
-
-```promql
-# Latest loss for each run
-ai_training_loss
-
-# Current gradient norm
-ai_training_gradient_norm
-
-# Current step
-ai_training_current_step
-
-# Ingestion rate over one minute
-rate(ai_telemetry_events_total{route="prometheus"}[1m])
-
-# Events that did not match the training route
-ai_telemetry_events_total{route="dropped"}
-```
-
-`run_id` is the only training label. Do **not** make `step`, timestamps, model
-inputs, prompts, or request IDs Prometheus labels in a real system: they create
-unbounded cardinality. Put high-cardinality detail in logs or a telemetry/event
-store instead.
-
-## Metrics contract
+## Metric contract
 
 | Metric | Type | Labels | Meaning |
 |---|---|---|---|
-| `ai_training_loss` | Gauge | `run_id` | Latest observed loss. |
-| `ai_training_gradient_norm` | Gauge | `run_id` | Latest observed gradient L2 norm. |
-| `ai_training_batch_size` | Gauge | `run_id` | Latest batch size. |
-| `ai_training_current_step` | Gauge | `run_id` | Latest completed step. |
-| `ai_telemetry_events_total` | Counter | `route` | Records accepted by the Prometheus route or dropped by routing. |
+| `ai_training_loss` | Gauge | `run_id` | Latest reported loss from an accepted event. |
+| `ai_training_gradient_norm` | Gauge | `run_id` | Latest reported gradient norm from an accepted event. |
+| `ai_training_batch_size` | Gauge | `run_id` | Latest reported batch size from an accepted event. |
+| `ai_training_current_step` | Gauge | `run_id` | Latest reported completed step. |
+| `ai_telemetry_events_total` | Counter | `route` | Records routed to Prometheus or dropped. |
+| `ai_telemetry_validation_events_total` | Counter | `outcome` | Records accepted or rejected by the contract validator. |
 
-## Replacing the local router with Cribl Stream
+`step`, timestamps, prompts, model inputs, request IDs, and model outputs are
+not metric labels. They have unbounded cardinality and should be handled by an
+appropriate event store subject to the organisation's data policy.
 
-The local router is a conceptual stand-in only. In a real deployment:
+## Roadmap
 
-1. Emit structured JSON logs/events from the training workload with the same
-   five core fields plus a stable event type such as `training_step`.
-2. Configure a Cribl Stream Source appropriate to the transport: HTTP, Kafka,
-   OpenTelemetry, Fluent Forward, or an agent/file source. Secure the
-   transport with TLS and authentication.
-3. Create a Pipeline that validates numeric fields, normalizes the timestamp,
-   adds environment/model/version metadata, redacts sensitive data, and
-   samples or aggregates high-volume step events.
-4. Add Routes that send valid training telemetry to the chosen destination:
-   Prometheus remote write-compatible metrics infrastructure, an OpenTelemetry
-   collector, a log/event store, and optionally a dead-letter destination for
-   invalid events.
-5. Apply production safeguards in Stream: route filtering, persistent queues,
-   backpressure limits, monitoring/alerts, least-privilege credentials, and
-   retention controls. Use Cribl's deployed product documentation for the
-   exact source, pipeline, route, and destination configuration syntax.
-6. Preserve the metric contract above, especially the bounded labels, so the
-   Grafana panels and PromQL remain stable after the replacement.
-
-This repository deliberately leaves vendor-specific configuration out so it is
-runnable locally with no account, token, or cloud resource.
-
-## Tests
-
-Run the focused conversion, route, and metric-exposition tests:
-
-```bash
-python -m pytest
-```
+| Pass | Name | Focus |
+|---|---|---|
+| 1 | Opening Salvo | Public evidence console and accessible project narrative. |
+| 2 | Harden and Verify | Contract validation, independent verifier, documented tests, local proof, and scope boundaries. |
+| 3 | mock_deploy | A reviewed deployment model without cloud credentials. |
+| 4 | Break_b4_Buying | Deliberately test failure modes and recovery assumptions before infrastructure spend. |
+| 5 | Interlude | Consolidate verified evidence, decisions, and next-step recommendations. |

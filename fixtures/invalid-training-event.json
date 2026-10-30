@@ -1,0 +1,9 @@
+{
+  "event_type": "training_step",
+  "run_id": "",
+  "step": -1,
+  "loss": 0.183,
+  "gradient_norm": 0.91,
+  "batch_size": 0,
+  "timestamp": "not-a-timestamp"
+}

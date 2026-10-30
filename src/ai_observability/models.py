@@ -52,9 +52,10 @@ class TrainingTelemetry:
         batch_size: Any,
         timestamp: datetime | None = None,
     ) -> "TrainingTelemetry":
-        if not isinstance(run_id, str) or not run_id.strip():
-            raise ValueError("run_id must be a non-empty string")
-        if isinstance(step, bool) or int(step) < 0:
+        if not isinstance(run_id, str) or not run_id.strip() or len(run_id.strip()) > 128:
+            raise ValueError("run_id must be a non-empty string of at most 128 characters")
+        normalized_step = _as_number(step, "step")
+        if not normalized_step.is_integer() or normalized_step < 0:
             raise ValueError("step must be a non-negative integer")
 
         normalized_batch_size = _as_number(batch_size, "batch_size")
@@ -65,11 +66,15 @@ class TrainingTelemetry:
         if event_time.tzinfo is None:
             raise ValueError("timestamp must be timezone-aware")
 
+        normalized_gradient_norm = _as_number(gradient_norm, "gradient_norm")
+        if normalized_gradient_norm < 0:
+            raise ValueError("gradient_norm must be non-negative")
+
         return cls(
             run_id=run_id.strip(),
-            step=int(step),
+            step=int(normalized_step),
             loss=_as_number(loss, "loss"),
-            gradient_norm=_as_number(gradient_norm, "gradient_norm"),
+            gradient_norm=normalized_gradient_norm,
             batch_size=int(normalized_batch_size),
             timestamp=event_time.astimezone(timezone.utc),
         )
@@ -85,4 +90,3 @@ class TrainingTelemetry:
             "batch_size": self.batch_size,
             "timestamp": self.timestamp.isoformat(),
         }
-

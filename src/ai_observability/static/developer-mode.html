@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A short, local knowledge check before developer inspection tools are shown.">
+    <title>Veyepr | Developer Mode</title>
+    <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+  </head>
+  <body class="triolingo-page">
+    <a class="skip-link" href="#developer-mode">Skip to developer mode</a>
+    <header class="site-header">
+      <a class="wordmark" href="./" aria-label="Veyepr home">VEYEPR<span>.</span></a>
+      <nav aria-label="Primary navigation">
+        <a href="./">Evidence</a>
+        <a href="decision-record.html">Decision record</a>
+        <a aria-current="page" href="developer-mode.html">Developer mode</a>
+      </nav>
+    </header>
+    <main id="developer-mode">
+      <section class="tri-hero">
+        <p class="eyebrow"><span class="status-dot"></span> LOCAL INSPECTION</p>
+        <p class="section-index">DEVELOPER MODE</p>
+        <h1>Confirm the <em>operating model.</em></h1>
+        <p class="lede">Developer mode exposes the contract fixtures and local verification commands. Before showing them, answer three short questions about the boundaries this project is designed to enforce.</p>
+        <p class="system-note"><b>Important:</b> this is an intent and learning check, not a security boundary. This public build contains no harmful or privileged tools; real access control belongs on the server and identity provider.</p>
+      </section>
+      <section class="lesson-sequence">
+        <form class="knowledge-check" id="knowledge-check">
+          <fieldset>
+            <legend><span>01</span> Which value must not be used as a Prometheus label?</legend>
+            <label><input type="radio" name="q1" value="step"> The changing training step</label>
+            <label><input type="radio" name="q1" value="run"> The bounded run identifier</label>
+            <label><input type="radio" name="q1" value="route"> The route outcome</label>
+          </fieldset>
+          <fieldset>
+            <legend><span>02</span> What does the verifier prove today?</legend>
+            <label><input type="radio" name="q2" value="truth"> That every model output is true</label>
+            <label><input type="radio" name="q2" value="contract"> That telemetry records follow the declared contract</label>
+            <label><input type="radio" name="q2" value="policy"> That a production policy has been approved</label>
+          </fieldset>
+          <fieldset>
+            <legend><span>03</span> Where should consequential output grading live?</legend>
+            <label><input type="radio" name="q3" value="chart"> Inside a chart with no reviewer</label>
+            <label><input type="radio" name="q3" value="policy"> In a declared policy with evidence and accountable review</label>
+            <label><input type="radio" name="q3" value="prompt"> In an unrecorded one-shot prompt</label>
+          </fieldset>
+          <button class="button button-primary" type="submit">Continue to local verification <span aria-hidden="true">→</span></button>
+          <p class="form-feedback" id="form-feedback" role="status"></p>
+        </form>
+        <section class="developer-tools" id="developer-tools" hidden aria-labelledby="tools-title">
+          <p class="section-index">LOCAL VERIFICATION PATHS</p>
+          <h2 id="tools-title">Run the evidence locally.</h2>
+          <p>These commands do not call an LLM, send prompts, or use cloud credentials.</p>
+          <pre><code># Zero-package browser preview
+./scripts/run-local-preview.sh
+
+# Validate the shared event contract with Rust
+make verify-rust
+make verify-contract
+
+# Optional full Compose integration proof
+make verify-compose</code></pre>
+          <a class="button button-quiet" href="https://github.com/87Supreme-cell/Veyepr/tree/main/fixtures">Inspect contract fixtures <span aria-hidden="true">↗</span></a>
+        </section>
+      </section>
+    </main>
+    <footer>
+      <span>VEYEPR / DEVELOPER MODE</span>
+      <a href="./">Evidence console <span aria-hidden="true">↗</span></a>
+      <span>Evidence before assertion.</span>
+    </footer>
+    <script src="assets/developer-mode.js"></script>
+  </body>
+</html>

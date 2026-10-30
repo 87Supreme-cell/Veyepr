@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="The Veyepr product and architecture decision record.">
+    <title>Veyepr | Decision Record</title>
+    <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles.css">
+  </head>
+  <body class="triolingo-page">
+    <a class="skip-link" href="#decisions">Skip to decisions</a>
+    <header class="site-header">
+      <a class="wordmark" href="./" aria-label="Veyepr home">VEYEPR<span>.</span></a>
+      <nav aria-label="Primary navigation">
+        <a href="./">Evidence</a>
+        <a aria-current="page" href="decision-record.html">Decision record</a>
+      </nav>
+    </header>
+    <main id="decisions">
+      <section class="tri-hero">
+        <p class="eyebrow"><span class="status-dot"></span> PASS 2 / HARDEN AND VERIFY</p>
+        <p class="section-index">DECISION RECORD</p>
+        <h1>Make the product choices <em>reviewable.</em></h1>
+        <p class="lede">This page records the decisions made by the product lead: why the system begins with evidence, what it validates today, and what it intentionally refuses to claim.</p>
+      </section>
+      <section class="lesson-sequence">
+        <article class="lesson-card">
+          <div class="lesson-label"><span>01</span> Product decision</div>
+          <h2>Start with AI usage evidence, not a generic score.</h2>
+          <p><b>Decision:</b> Veyepr first validates and observes the operational signals around AI use. It does not label a model or user “good” or “bad” from a shallow set of metrics.</p>
+          <p><b>Reason:</b> A serious enterprise assessment needs a declared rubric, appropriate context, a review owner, and retained evidence. A dashboard cannot responsibly invent those inputs.</p>
+          <aside><b>Result:</b> The product can support future policy scoring without misleading an operator today.</aside>
+        </article>
+        <article class="lesson-card lesson-card-dark">
+          <div class="lesson-label"><span>02</span> Reliability decision</div>
+          <h2>Publish the contract and verify it twice.</h2>
+          <p><b>Decision:</b> The event shape is a versioned JSON Schema. The Python reference pipeline and a separate Rust verifier both enforce its required fields, types, timestamps, and bounded identifiers.</p>
+          <p><b>Reason:</b> Accuracy matters more than throughput for this stage. Independent implementations reduce the risk that a single runtime assumption quietly accepts bad evidence.</p>
+          <aside><b>Result:</b> Teams can validate an event before deployment with the same contract used by the running reference pipeline.</aside>
+        </article>
+        <article class="lesson-card">
+          <div class="lesson-label"><span>03</span> Deployment decision</div>
+          <h2>Demand reproducible proof before calling it deployable.</h2>
+          <p><b>Decision:</b> The repository includes one command that starts the Compose stack and verifies health, contract metrics, event capture, and Prometheus scrape health. Rust verification runs in a pinned compiler container.</p>
+          <p><b>Reason:</b> A preview page proves presentation, not operation. Reproducible checks create a concrete handoff for an engineer or evaluator.</p>
+          <aside><b>Result:</b> The next pass can harden a known baseline instead of guessing whether the demo works on another machine.</aside>
+        </article>
+      </section>
+      <section class="interview-close">
+        <div>
+          <p class="section-index">CURRENT BOUNDARY</p>
+          <h2>Evidence first. Policy-driven assessment next.</h2>
+          <p>Veyepr is ready to demonstrate validated telemetry collection and verification. Output-quality grading remains deliberately deferred until its evaluation criteria, data handling, and human-accountability model are explicit.</p>
+          <a class="button button-primary" href="./">Return to evidence <span aria-hidden="true">→</span></a>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>VEYEPR / DECISION RECORD</span>
+      <a href="./">Evidence console <span aria-hidden="true">↗</span></a>
+      <span>Evidence before assertion.</span>
+    </footer>
+  </body>
+</html>

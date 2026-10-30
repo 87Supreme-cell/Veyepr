@@ -9,7 +9,7 @@ description = "A hands-on local AI training telemetry pipeline for Prometheus an
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "prometheus-client>=0.20,<1.0",
+    "prometheus-client==0.21.1",
 ]
 
 [project.optional-dependencies]

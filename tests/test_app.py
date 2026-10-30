@@ -22,15 +22,14 @@ def test_console_and_triolingo_pages_are_served() -> None:
         with urlopen(f"http://127.0.0.1:{port}/") as response:
             page = response.read().decode("utf-8")
             assert response.headers["Content-Type"].startswith("text/html")
-        with urlopen(f"http://127.0.0.1:{port}/triolingo") as response:
-            triolingo = response.read().decode("utf-8")
-        with urlopen(f"http://127.0.0.1:{port}/triolingo.html") as response:
-            triolingo_html = response.read().decode("utf-8")
+        with urlopen(f"http://127.0.0.1:{port}/decision-record") as response:
+            decision_record = response.read().decode("utf-8")
+        with urlopen(f"http://127.0.0.1:{port}/developer-mode") as response:
+            developer_mode = response.read().decode("utf-8")
 
         assert "VEYEPR" in page
-        assert "Triolingo" in page
-        assert "Three" in triolingo
-        assert "Three" in triolingo_html
+        assert "Decision Record" in decision_record
+        assert "Developer mode" in developer_mode
     finally:
         server.shutdown()
         server.server_close()
