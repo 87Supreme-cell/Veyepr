@@ -1,4 +1,8 @@
-# Local AI Observability Pipeline
+# Veyepr: Local AI Observability Pipeline
+
+> **Portfolio case study:** an approachable, production-minded telemetry
+> boundary for model training. It is intentionally runnable without cloud
+> credentials, a GPU, PyTorch, or a proprietary routing product.
 
 A complete, local demonstration of AI training observability:
 
@@ -12,6 +16,37 @@ A complete, local demonstration of AI training observability:
 4. Prometheus scrapes those metrics and Grafana loads a dashboard automatically.
 
 The simulation is the default, so neither a GPU nor PyTorch is required.
+
+## Portfolio walkthrough
+
+Veyepr is designed around one practical question: **how can an engineer tell
+whether a model-training run is healthy without turning every training detail
+into an expensive metric?**
+
+The project demonstrates:
+
+- **A stable telemetry contract.** `TrainingTelemetry` receives the training
+  values at the application boundary and accepts both ordinary Python numbers
+  and PyTorch-style scalar tensors.
+- **A visible routing boundary.** Capture, normalization, enrichment, and
+  routing are separate operations so the observable behavior is easy to
+  explain, test, and replace with a managed router later.
+- **Intentional metric cardinality.** `run_id` is the only training label;
+  ever-changing values such as steps, timestamps, prompts, and inputs remain
+  in the event stream rather than multiplying Prometheus time series.
+- **An operational interface.** The root route is a live observation console
+  powered by the same `/metrics` and `/events` APIs consumed by Prometheus.
+  `/triolingo` is an interview-ready, plain-English walkthrough of the design.
+
+### Interface routes
+
+| Route | Audience | Purpose |
+|---|---|---|
+| `/` | Developer or operator | A live, auto-refreshing readout of loss, gradient norm, batch size, current step, routed count, and loss trend. |
+| `/triolingo` | Interviewer or new CS student | Explains the project in plain English, system-thinking language, and code-thinking language. |
+| `/events` | Developer | Shows a bounded sample of normalized events. |
+| `/metrics` | Prometheus | Exposes the Prometheus text-format metric contract. |
+| `/healthz` | Runtime platform | Provides a lightweight health response. |
 
 ## Architecture
 
@@ -59,6 +94,8 @@ docker compose up --build
 
 Open:
 
+- Veyepr live console: <http://localhost:8000>
+- Triolingo explainer: <http://localhost:8000/triolingo>
 - App metrics: <http://localhost:8000/metrics>
 - Captured event sample: <http://localhost:8000/events>
 - Prometheus: <http://localhost:9090>
@@ -92,6 +129,8 @@ and gradient-norm values. It exposes:
 | `GET /healthz` | Liveness response: `{"status":"ok"}` |
 | `GET /metrics` | Prometheus text exposition |
 | `GET /events` | Last captured normalized events, useful for learning and debugging |
+| `GET /` | Veyepr's live observation console |
+| `GET /triolingo` | The plain-English interview explainer |
 
 Use the optional real PyTorch loop only after installing a compatible PyTorch
 distribution:
@@ -200,4 +239,3 @@ Run the focused conversion, route, and metric-exposition tests:
 ```bash
 python -m pytest
 ```
-

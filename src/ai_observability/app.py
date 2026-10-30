@@ -10,8 +10,10 @@ import time
 from collections.abc import Iterator
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from importlib.resources import files
 from threading import Event, Thread
 from typing import cast
+from urllib.parse import urlparse
 
 from .models import TrainingTelemetry
 from .router import LocalStreamPipeline
@@ -24,7 +26,8 @@ class PipelineRequestHandler(BaseHTTPRequestHandler):
     pipeline: LocalStreamPipeline
 
     def do_GET(self) -> None:  # noqa: N802
-        if self.path == "/metrics":
+        path = urlparse(self.path).path
+        if path == "/metrics":
             body = self.pipeline.metrics.render_latest()
             self.send_response(HTTPStatus.OK)
             self.send_header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
@@ -32,11 +35,22 @@ class PipelineRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
-        if self.path == "/healthz":
+        if path == "/healthz":
             self._send_json(HTTPStatus.OK, {"status": "ok"})
             return
-        if self.path == "/events":
+        if path == "/events":
             self._send_json(HTTPStatus.OK, self.pipeline.recent_records())
+            return
+        static_files = {
+            "/": ("index.html", "text/html; charset=utf-8"),
+            "/triolingo": ("triolingo.html", "text/html; charset=utf-8"),
+            "/assets/styles.css": ("styles.css", "text/css; charset=utf-8"),
+            "/assets/app.js": ("app.js", "application/javascript; charset=utf-8"),
+            "/assets/vioer.svg": ("vioer.svg", "image/svg+xml"),
+        }
+        asset = static_files.get(path)
+        if asset:
+            self._send_static(*asset)
             return
         self._send_json(HTTPStatus.NOT_FOUND, {"error": "not found"})
 
@@ -50,6 +64,14 @@ class PipelineRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(encoded)))
         self.end_headers()
         self.wfile.write(encoded)
+
+    def _send_static(self, filename: str, content_type: str) -> None:
+        body = files("ai_observability").joinpath("static", filename).read_bytes()
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
 
 def run(
@@ -124,4 +146,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
