@@ -1,7 +1,7 @@
 # Veyepr Continuation Plan: Passes 3–5
 
-**Status:** Pass 3 is in progress. Passes 4 and 5 remain planning handoff
-only.
+**Status:** Pass 3 — mock deployment is implemented locally in `f3c1b9c`.
+Passes 4 and 5 remain planning handoff only.
 **Last completed milestone:** Pass 2 — Harden and Verify (`bdbd7eb`).
 
 This file preserves the product-lead observations and the structure for the
@@ -106,6 +106,31 @@ would flow, what must be configured, and which claims are verified locally.
 The selected decisions narrow the Pass 3 prototype to a local policy evaluator
 and evidence generator. It does not intercept traffic, OAuth tokens, agent
 sessions, SharePoint activity, screens, or real data.
+
+## Pass 3 completion evidence
+
+The local implementation has completed these proof points:
+
+- `20` deterministic Python tests pass, including normal action, review-required
+  action, metadata-only package, tamper detection, output-collision rejection,
+  and mock-deployment preflight cases.
+- `./scripts/verify-local.sh` passes without Docker or external packages.
+- `./scripts/mock-deploy-preflight.sh <new-directory>` creates a preflight
+  report plus a review package for the supplied sensitive-export fixture.
+- The generated package has `review_required`, `review_only`, and both
+  `security_reviewer` plus `session_subject` review parties. It records no raw
+  prompt or raw tool-output content.
+- The optional Rust regression check is unchanged. At the close of this pass,
+  Docker Desktop was unavailable locally, so its containerized check was not
+  rerun; the Pass 2 locked Rust result remains the latest recorded result.
+
+### Public-preview note
+
+The static mock-deployment page is committed and included in the Pages
+workflow. At the close of this pass, GitHub's Pages API returned `404`, and
+the Pages configuration step failed before artifact upload. Re-enable GitHub
+Pages with **GitHub Actions** as the build source, then rerun `Deploy
+portfolio preview` to publish `mock-deploy.html`.
 
 ## Explicitly out of scope
 
