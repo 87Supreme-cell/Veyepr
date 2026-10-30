@@ -8,6 +8,7 @@ from ai_observability.sentinel import (
     SentinelPolicy,
     build_audit_package,
     evaluate_action,
+    validate_agent_action_contract,
     verify_audit_package,
 )
 
@@ -67,3 +68,17 @@ def test_action_rejects_raw_content_or_unknown_fields() -> None:
 
     with pytest.raises(ValueError, match="unexpected fields"):
         AgentAction.from_record(record)
+
+
+def test_contract_rejects_unknown_fields_and_missing_hash_pattern() -> None:
+    contract = load_json("contracts/agent-action.schema.json")
+    contract["additionalProperties"] = True
+
+    with pytest.raises(ValueError, match="reject unknown"):
+        validate_agent_action_contract(contract)
+
+    contract = load_json("contracts/agent-action.schema.json")
+    del contract["properties"]["prompt_hash"]["pattern"]
+
+    with pytest.raises(ValueError, match="prompt_hash"):
+        validate_agent_action_contract(contract)

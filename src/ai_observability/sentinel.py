@@ -303,6 +303,38 @@ def verify_audit_package(package: Mapping[str, Any]) -> bool:
     return isinstance(digest, str) and sha256(_canonical_json(package_copy).encode("utf-8")).hexdigest() == digest
 
 
+def validate_agent_action_contract(contract: Mapping[str, Any]) -> None:
+    """Verify the schema invariants that protect metadata-only evaluation.
+
+    The runtime parser remains the executable validator. This check binds the
+    mock-deployment preflight to the published JSON Schema so an edited schema
+    cannot silently weaken the documented contract while retaining its title.
+    """
+    if contract.get("title") != "Veyepr sanitized agent action":
+        raise ValueError("agent action contract title does not match the expected contract")
+    if contract.get("type") != "object" or contract.get("additionalProperties") is not False:
+        raise ValueError("agent action contract must reject unknown object fields")
+    required = contract.get("required")
+    if not isinstance(required, list) or set(required) != ACTION_FIELDS or len(required) != len(ACTION_FIELDS):
+        raise ValueError("agent action contract required fields do not match the runtime contract")
+    properties = contract.get("properties")
+    if not isinstance(properties, Mapping) or set(properties) != ACTION_FIELDS:
+        raise ValueError("agent action contract properties do not match the runtime contract")
+    if properties["event_type"].get("const") != "agent_tool_action":
+        raise ValueError("agent action contract event_type is not bound to agent_tool_action")
+    if properties["action_type"].get("enum") != [
+        "oauth_scope_request",
+        "data_export",
+        "asset_mutation",
+        "tool_read",
+    ]:
+        raise ValueError("agent action contract action_type values do not match the runtime contract")
+    expected_hash_pattern = r"^sha256:[a-f0-9]{64}$"
+    for field in ("prompt_hash", "tool_output_hash"):
+        if properties[field].get("pattern") != expected_hash_pattern:
+            raise ValueError(f"agent action contract {field} must require a sha256 hash")
+
+
 def load_json(path: Path) -> dict[str, Any]:
     """Read a JSON object with an explicit helpful error for non-object files."""
     with path.open(encoding="utf-8") as file:

@@ -17,6 +17,7 @@ from .sentinel import (
     build_audit_package,
     evaluate_action,
     load_json,
+    validate_agent_action_contract,
     verify_audit_package,
 )
 
@@ -64,8 +65,7 @@ def run_preflight(config_path: Path, repository_root: Path) -> tuple[dict[str, o
             raise FileNotFoundError(f"required mock deployment artifact is missing: {path}")
 
     contract = load_json(contract_path)
-    if contract.get("title") != "Veyepr sanitized agent action":
-        raise ValueError("agent action contract title does not match the expected contract")
+    validate_agent_action_contract(contract)
     policy = SentinelPolicy.from_record(load_json(policy_path))
     action = AgentAction.from_record(load_json(action_path))
     decision = evaluate_action(action, policy)
