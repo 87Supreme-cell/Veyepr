@@ -24,6 +24,8 @@ torch = [
 ai-observability-demo = "ai_observability.app:main"
 veyepr-mock-deploy = "ai_observability.mock_deploy:main"
 veyepr-break-drills = "ai_observability.drills:main"
+veyepr-firm-adapter = "ai_observability.firm:main"
+veyepr-firm-mcp = "ai_observability.firm_mcp:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

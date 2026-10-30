@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "veyepr-the-firm": {
+      "command": "python3",
+      "args": [
+        "-m",
+        "ai_observability.firm_mcp",
+        "--log",
+        "artifacts/firm-demo/firm-execution-log.md",
+        "--policy",
+        "policy/mock-sentinel-policy.json"
+      ],
+      "env": {
+        "PYTHONPATH": "src"
+      }
+    }
+  }
+}

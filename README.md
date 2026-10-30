@@ -207,6 +207,8 @@ evidence.
 | Review-only preflight | `tests/test_mock_deploy.py` | Mock deployment config, policy, and sensitive-export fixture | The local preflight creates metadata-only review evidence and refuses overwrites. |
 | Failure and recovery drills | `tests/test_drills.py` | [`failure-drills.json`](fixtures/failure-drills.json) | Five expected outcomes are deterministic: one rejected, three review-required, and one clean recovery. |
 | Contract drift guard | `tests/test_drills.py` | A weakened copy of the agent-action schema | The drills refuse a schema that permits unknown metadata fields. |
+| The Firm host adapter | `tests/test_firm.py` | Sanitized NDJSON fixture with one normal action and one review-required action | The host-controlled digest chain records review-only outcomes and exports Markdown or text without raw content. |
+| The Firm read-only MCP | `tests/test_firm.py` | A generated host export and local JSON-RPC requests | MCP exposes only evidence-summary and policy-boundary tools; argument injection and policy/path authority are rejected. |
 
 Run the Python suite:
 
@@ -351,6 +353,44 @@ every collected Python test in the Pass 6 run, alongside the exact output from
 the static-preview, mock-deployment, and failure-drill checks. It also names
 the Rust verifier check as unavailable in the current environment rather than
 misrepresenting it as a pass.
+
+## The Firm — local AI and MCP attachment layer
+
+The [`the-firm`](THE_FIRM.md) branch adds a safe first attachment point for a
+local AI or agent session. An approved host or client wrapper sends
+sanitized, metadata-only action events to a **host-controlled adapter**. The
+adapter evaluates the fixed `review_only` policy and exports a new
+Markdown or plain-text execution log.
+
+```mermaid
+flowchart LR
+    H[Host wrapper] --> A[The Firm adapter]
+    A --> E[MD or TXT execution log]
+    E --> M[Read-only MCP server]
+    M --> L[Local AI client]
+```
+
+The model has **no authority** to grant access, block an action, alter policy,
+choose log paths, write or erase exports, or label an event as
+host-observed. The MCP server is read-only and can only summarize a
+host-configured log and its policy boundary.
+
+This is a protocol boundary. A real deployment must also place the adapter,
+policy, and export directory behind host-owned operating-system permissions;
+an AI client with unrestricted shell or filesystem access could otherwise
+bypass any local protocol restriction.
+
+```bash
+# Create a Markdown execution export from safe local fixtures.
+./scripts/run-firm-adapter.sh artifacts/firm-demo markdown
+
+# Create a plain-text export in a different new directory.
+./scripts/run-firm-adapter.sh artifacts/firm-demo-text text
+```
+
+See [`THE_FIRM.md`](THE_FIRM.md) for the architecture, exact authority
+boundary, MCP configuration example, and the intentionally deferred human
+case-handoff layer.
 
 ## Sentinel non-goals and security boundary
 
