@@ -1,0 +1,18 @@
+# HELP veyepr_portfolio_preview Signals that the public portfolio is in browser-simulated mode.
+# TYPE veyepr_portfolio_preview gauge
+veyepr_portfolio_preview 1
+# HELP ai_training_loss Latest training loss by run.
+# TYPE ai_training_loss gauge
+ai_training_loss{run_id="portfolio-preview"} 1.35
+# HELP ai_training_gradient_norm Latest gradient L2 norm by run.
+# TYPE ai_training_gradient_norm gauge
+ai_training_gradient_norm{run_id="portfolio-preview"} 1.92
+# HELP ai_training_batch_size Latest training batch size by run.
+# TYPE ai_training_batch_size gauge
+ai_training_batch_size{run_id="portfolio-preview"} 32
+# HELP ai_training_current_step Latest completed training step by run.
+# TYPE ai_training_current_step gauge
+ai_training_current_step{run_id="portfolio-preview"} 12
+# HELP ai_telemetry_events_total Training telemetry events processed by local route.
+# TYPE ai_telemetry_events_total counter
+ai_telemetry_events_total{route="prometheus"} 12

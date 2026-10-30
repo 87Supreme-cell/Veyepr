@@ -1,0 +1,13 @@
+[
+  {
+    "event_type": "training_step",
+    "run_id": "portfolio-preview",
+    "step": 12,
+    "loss": 1.35,
+    "gradient_norm": 1.92,
+    "batch_size": 32,
+    "timestamp": "2026-10-30T06:00:00+00:00",
+    "captured_at": "2026-10-30T06:00:00+00:00",
+    "pipeline": "browser-simulated-preview"
+  }
+]

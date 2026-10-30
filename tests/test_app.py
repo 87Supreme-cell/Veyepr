@@ -24,11 +24,13 @@ def test_console_and_triolingo_pages_are_served() -> None:
             assert response.headers["Content-Type"].startswith("text/html")
         with urlopen(f"http://127.0.0.1:{port}/triolingo") as response:
             triolingo = response.read().decode("utf-8")
+        with urlopen(f"http://127.0.0.1:{port}/triolingo.html") as response:
+            triolingo_html = response.read().decode("utf-8")
 
         assert "VEYEPR" in page
         assert "Triolingo" in page
         assert "Three" in triolingo
+        assert "Three" in triolingo_html
     finally:
         server.shutdown()
         server.server_close()
-

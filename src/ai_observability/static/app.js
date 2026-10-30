@@ -1,5 +1,6 @@
 const history = [];
 const maxHistory = 24;
+let demoStep = 12;
 
 const elements = {
   loss: document.querySelector("#loss-value"),
@@ -51,11 +52,44 @@ function drawHistory() {
   elements.point.setAttribute("cy", last[1]);
 }
 
+function showSignal({ loss, gradient, batch, step, total, runId, event }) {
+  renderNumber(elements.loss, loss, 4);
+  renderNumber(elements.gradient, gradient, 3);
+  renderNumber(elements.batch, batch, 0);
+  renderNumber(elements.step, step, 0);
+  elements.runId.textContent = runId ? `run / ${runId}` : "waiting for run";
+  elements.count.textContent = `${Math.round(total || 0)} events routed`;
+
+  if (event) {
+    elements.summary.textContent = event;
+  }
+  if (Number.isFinite(loss) && history.at(-1) !== loss) {
+    history.push(loss);
+    if (history.length > maxHistory) history.shift();
+    drawHistory();
+  }
+}
+
+function showPortfolioSimulation() {
+  demoStep += 1;
+  const loss = Math.max(0.06, 1.8 * Math.exp(-demoStep / 42) + Math.sin(demoStep * 1.7) * 0.025);
+  const gradient = Math.max(0.08, 2.3 * Math.exp(-demoStep / 68) + Math.cos(demoStep) * 0.04);
+  showSignal({
+    loss,
+    gradient,
+    batch: 32,
+    step: demoStep,
+    total: demoStep,
+    runId: "portfolio-preview",
+    event: "Portfolio preview mode: simulated telemetry is running in your browser. Run the local service for live pipeline data.",
+  });
+}
+
 async function updateSignal() {
   try {
     const [metricsResponse, eventsResponse] = await Promise.all([
-      fetch("/metrics", { cache: "no-store" }),
-      fetch("/events", { cache: "no-store" }),
+      fetch("metrics", { cache: "no-store" }),
+      fetch("events", { cache: "no-store" }),
     ]);
     if (!metricsResponse.ok || !eventsResponse.ok) throw new Error("Signal endpoint unavailable");
 
@@ -67,25 +101,25 @@ async function updateSignal() {
     const step = metricValue(metrics, "ai_training_current_step");
     const total = metricValue(metrics, "ai_telemetry_events_total");
     const runId = metricLabel(metrics, "ai_training_loss", "run_id");
+    const isPortfolioPreview = /^veyepr_portfolio_preview\s+1$/m.test(metrics);
 
-    renderNumber(elements.loss, loss, 4);
-    renderNumber(elements.gradient, gradient, 3);
-    renderNumber(elements.batch, batch, 0);
-    renderNumber(elements.step, step, 0);
-    elements.runId.textContent = runId ? `run / ${runId}` : "waiting for run";
-    elements.count.textContent = `${Math.round(total || 0)} events routed`;
+    if (isPortfolioPreview) {
+      showPortfolioSimulation();
+      return;
+    }
 
     const latest = events.at(-1);
-    if (latest) {
-      elements.summary.textContent = `Latest event: ${latest.run_id}, step ${latest.step}, captured ${new Date(latest.captured_at).toLocaleTimeString()}.`;
-    }
-    if (Number.isFinite(loss) && history.at(-1) !== loss) {
-      history.push(loss);
-      if (history.length > maxHistory) history.shift();
-      drawHistory();
-    }
+    showSignal({
+      loss,
+      gradient,
+      batch,
+      step,
+      total,
+      runId,
+      event: latest ? `Latest event: ${latest.run_id}, step ${latest.step}, captured ${new Date(latest.captured_at).toLocaleTimeString()}.` : null,
+    });
   } catch (error) {
-    elements.summary.textContent = "The live signal is unavailable. Start the local telemetry service to connect this console.";
+    showPortfolioSimulation();
   }
 }
 
@@ -93,4 +127,3 @@ if (elements.loss) {
   updateSignal();
   window.setInterval(updateSignal, 2000);
 }
-

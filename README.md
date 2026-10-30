@@ -17,6 +17,36 @@ A complete, local demonstration of AI training observability:
 
 The simulation is the default, so neither a GPU nor PyTorch is required.
 
+## Public portfolio preview
+
+The public, shareable experience is deployed through GitHub Pages:
+
+**[Open the Veyepr portfolio preview](https://87Supreme-cell.github.io/Veyepr/)**
+
+The Pages build is intentionally self-contained. It shows a browser-simulated
+training signal so visitors can explore the console and Triolingo without
+needing access to a running container, Prometheus, or Grafana. When the same
+assets are served by the Python app, they automatically use the live local
+`/metrics` and `/events` endpoints instead.
+
+The workflow in [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml)
+publishes the static console whenever its frontend assets change on `main`. If
+the preview is not yet available, enable **GitHub Pages → Build and deployment
+→ GitHub Actions** in the repository settings, then rerun the workflow.
+
+## Project path
+
+This project is being built in deliberate passes so each milestone can be
+explained and verified:
+
+| Pass | Name | Intent |
+|---|---|---|
+| 1 | **Opening Salvo** | Publish an accessible portfolio preview, establish the narrative, and make the interface explorable without localhost. |
+| 2 | **Harden and Verify** | Establish runtime checks, negative-path coverage, accessibility review, and reproducible verification. |
+| 3 | **mock_deploy** | Model a production release path and deployment configuration without requiring cloud credentials. |
+| 4 | **Break_b4_Buying** | Intentionally exercise failure modes, recovery paths, and operating assumptions before committing to infrastructure spend. |
+| 5 | **Interlude** | Consolidate the working result into a concise, interview-ready narrative and evidence package. |
+
 ## Portfolio walkthrough
 
 Veyepr is designed around one practical question: **how can an engineer tell
@@ -92,14 +122,16 @@ Start the app, Prometheus, and Grafana:
 docker compose up --build
 ```
 
-Open:
+When running Docker Compose locally, open:
 
-- Veyepr live console: <http://localhost:8000>
-- Triolingo explainer: <http://localhost:8000/triolingo>
-- App metrics: <http://localhost:8000/metrics>
-- Captured event sample: <http://localhost:8000/events>
-- Prometheus: <http://localhost:9090>
-- Grafana: <http://localhost:3000> (`admin` / `admin`)
+| Local service | Address |
+|---|---|
+| Veyepr live console | `http://localhost:8000` |
+| Triolingo explainer | `http://localhost:8000/triolingo` |
+| App metrics | `http://localhost:8000/metrics` |
+| Captured event sample | `http://localhost:8000/events` |
+| Prometheus | `http://localhost:9090` |
+| Grafana | `http://localhost:3000` (`admin` / `admin`) |
 
 Grafana provisions **Local AI Observability / Local AI Training
 Observability** automatically. Stop and remove containers plus persisted

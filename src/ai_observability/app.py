@@ -44,6 +44,7 @@ class PipelineRequestHandler(BaseHTTPRequestHandler):
         static_files = {
             "/": ("index.html", "text/html; charset=utf-8"),
             "/triolingo": ("triolingo.html", "text/html; charset=utf-8"),
+            "/triolingo.html": ("triolingo.html", "text/html; charset=utf-8"),
             "/assets/styles.css": ("styles.css", "text/css; charset=utf-8"),
             "/assets/app.js": ("app.js", "application/javascript; charset=utf-8"),
             "/assets/vioer.svg": ("vioer.svg", "image/svg+xml"),
