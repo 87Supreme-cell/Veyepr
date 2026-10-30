@@ -1,3 +1,4 @@
+# This deterministic fixture lets the GitHub Pages preview run without a backend.
 # HELP veyepr_portfolio_preview Signals that the public portfolio is in browser-simulated mode.
 # TYPE veyepr_portfolio_preview gauge
 veyepr_portfolio_preview 1
